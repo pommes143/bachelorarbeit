@@ -1,0 +1,130 @@
+Own thoughts:
+	limitations of own work and next steps are a big part
+
+
+
+#Paassen Email:
+## Structure
+
+1. **Introduction:**
+1. first sentence: what is the general problem and why does it
+matter ("how do we save the world?!")
+2. second sentence: what would be the solution to the problem and
+why is it difficult to obtain?
+3. third sentence: zoom in: what is the subproblem that we consider
+here?
+4. second paragraph: how has prior work attempted to solve the
+subproblem? Why are these prior attempts insufficient? (you should cover
+all this related work in more detail in section 2)
+5. third paragraph: how do you propose to do better?
+6. fourth paragraph: be very specific and precise: what are the
+contributions of this work **beyond** prior work? Could even be a bullet
+point list
+2. **Background and Related work:**
+* Add one section per crucial concept/research area for your work.
+In each section, summarize the most crucial past works (with citing
+them!) and briefly summarize what your work is doing different.
+* Use this section also to introduce key notation and concepts
+* NOTE: all that has been done before should be covered at the end
+of this section; from section 3 onwards, (almost) everything should be
+your own contribution
+3. **Methods** (in ML, this section is the core of your thesis and
+should take the most space!): Start with a high-level description of
+your proposed method/your approach. Also provide an overview diagram
+illustrating the steps/components of your approach and how they interact
+(i.e. a process or architecture diagram).
+* Add one section per core step/component of your method. Start
+each section with a high-level description of the step/component and
+what it should accomplish. Then, provide a detailed description such
+that an experienced reader would be able to reproduce your approach from
+the description provided. Use illustrating diagrams whenever possible.
+Usually, it is NOT a good idea to use source code here (perhaps
+pseudocode, if you must).
+* Provide a good reason for each design choice (e.g. at least
+conceptually, ideally citations or a mathematical proof)
+* If possible: have a running example which you use to illustrate
+all the steps/parts of your method
+4. **Implementation** (optional): Describe, for each of the core
+steps/components, how you actually implemented it in code. Here, you can
+show snippets of source code.
+5. **Experiments:** Start with a high-level description what you want to
+show in your experiments (maybe even formal hypotheses)
+* describe all baselines, all experimental data sets, and all
+evaluation measures with citations/links; these should just be bullet
+point lists with a short description for each baseline and dataset and a
+short paragraph for the evaluation measures
+* Provide tables/diagrams illustrating your experimental results
+(with standard deviations!)
+* Report the key results in the text. Relate the results to your
+core experimental claims (method x outperforms method y).
+* Also add some context/discussion to explain surprising results
+(Surprisingly, we found x. This can likely be explained by the fact that
+...); only use the word "significantly" if you really did a significance
+test
+* If you did a user study, describe that in a separate section with
+its own little method section (where you describe your study setup and
+who you recruited) and its own little results section.
+6. **Conclusion:** Start with re-telling of the paper: high-level
+overview of your experimental results and how they support that your
+method is amazing
+* Limitations: what do the results **not** show (yet); what can
+your method **not** do?
+* Future work: what could be resolved in subsequent
+experiments/extensions of the method?
+* Some final sentence to round it off
+
+
+## General Writing Advice
+
+### Signposting
+
+Orient your reader; make it impossible to get lost, in particular:
+
+* Start each (sub-)section with high-level overview what you want to
+achieve in this section
+* Inside each section: Relate to overarching, high-level goals; make
+clear how the current content contributes
+* Clearly mark when you relate to an overarching contribution of the paper
+* Use paragraph headings and subsections whenever helpful; structure is
+your friend
+* At the end of complicated parts of the method section or involved
+experiments: summarize the key take-away once more
+### Argument flow
+
+overall: sentences should connect logically; use "logical connectors" or
+"operators", like:
+
+* Show gaps: It would be amazing to have x. Unfortunately, .../ However, ...
+* Tradeoffs: On the one hand, this method permits x. On the other hand,
+it is very slow. / This method achieves best results. However, it needs
+a lot of data.
+* Zoom in: On a high level, we want to do x. In detail, ... / In
+particular, ...
+* Categorize: There are three main approaches to achieve x. First, ...
+Second, ..., Third, ...
+
+### Jargon/Terminology
+
+In computer science research, jargon cannot be avoided **but** we should
+still explain key concepts and consistently use the same word for the
+same thing
+* Limit the amount of jargon/terminology you introduce as much as
+possible (ideally: only the name of your new method)
+* avoid too metaphorical/flowery terminology (example: "hallucinations",
+"imagining", etc.) because it leads to
+misunderstandings/hype/unrealistic expectations; rather, be boring and
+as clear/precise as you can (example: adversarial examples, tree edit
+distance)
+
+### Revisions
+
+Text usually gets good during revision, not during writing itself.
+
+* check whether your core story and your contributions are clear enough
+* check signposting and argument flow; is it clear enough? Do you need
+more explanations? Would an example help? Would diagrams help?
+* check how much redundancy is in the text; can you reduce it by cutting
+stuff?
+* check whether claims are followed by proof (citation or your own evidence)
+* make use of advice by your supervisors
+* check spelling and grammar
