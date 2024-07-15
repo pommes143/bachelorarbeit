@@ -28,6 +28,12 @@ def does_the_unit_test_run_successfully(filename):
     else:
         return False
     
+def measure_code_coverage(filename):
+    print("Measuring code coverage")
+    subprocess.call(f"coverage run {filename} ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage report ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage erase", shell = True, executable="/bin/sh")
+
 def extract_code_from_prompt(returned_string):
     start = '```'
     end = '```'
@@ -45,7 +51,7 @@ def extract_code_from_prompt(returned_string):
 
 def send_prompt_to_model(prompt):
     client = OpenAI(api_key="")
-    print("Sending prompt!")
+    print("Sending prompt!...")
     chat_completion = client.chat.completions.create(
         messages=[
             {"role": "system", "content": """You are an outstanding programmer, 
@@ -60,7 +66,7 @@ def send_prompt_to_model(prompt):
     )
     #with open(f"prompts/recorded_output_{datetime.now().strftime("%H:%M:%S")}","w") as file:
     #    file.write(chat_completion.choices[0].message.content)
-    print("Received result from chat-gpt")
+    print("...Received result from chat-gpt")
     return chat_completion.choices[0].message.content
 
 def construct_prompt_for_failed_unit_test():
@@ -82,11 +88,13 @@ if __name__ == "__main__":
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
     
     if(unit_test_bool):
-        print_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST)
-        print("Unit-test generation was succesful")
+        #print_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST)
+        print("SUCCESS! Unit-test generation was successful\n")
+        measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
+
 
     if(not unit_test_bool):
-        print("Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
+        print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
         created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test()))
         write_to_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST,created_python_unit_test_by_llm)
         unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
@@ -96,4 +104,6 @@ if __name__ == "__main__":
             prompt = construct_prompt_for_failed_unit_test()
             prompt += """To fix this unit-test remove only the specific line containing the error."""
             created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
-
+        else:
+            print("Fixing the Unit-test was successfull")
+        measure_code_coverage(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
