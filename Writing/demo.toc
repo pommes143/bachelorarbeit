@@ -1,0 +1,28 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Contents}{ii}{section*.1}%
+\contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
+\contentsline {chapter}{\chapternumberline {2}Background and related work}{2}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Unit-tests}{2}{section.2.1}%
+\contentsline {section}{\numberline {2.2}LLMs}{2}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}GPT}{2}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}related work}{2}{section.2.3}%
+\contentsline {chapter}{\chapternumberline {3}Methods}{3}{chapter.3}%
+\contentsline {section}{\numberline {3.1}high level description of my approach}{3}{section.3.1}%
+\contentsline {paragraph}{Lemma}{3}{section*.2}%
+\contentsline {section}{\numberline {3.2}provide overview diagram illustrating my steps}{3}{section.3.2}%
+\contentsline {chapter}{\chapternumberline {4}Implementation}{4}{chapter.4}%
+\contentsline {section}{\numberline {4.1} for each of the steps how it was implemented in the code}{4}{section.4.1}%
+\contentsline {chapter}{\chapternumberline {5}Experiments}{5}{chapter.5}%
+\contentsline {section}{\numberline {5.1}what i want to show}{5}{section.5.1}%
+\contentsline {section}{\numberline {5.2}how i want to show it}{5}{section.5.2}%
+\contentsline {section}{\numberline {5.3}baselines and assumptions}{5}{section.5.3}%
+\contentsline {section}{\numberline {5.4}what was my initial assumption}{5}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Table for experiments}{5}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Discussion of the results}{5}{section.5.6}%
+\contentsline {chapter}{\chapternumberline {6}Conclusion}{6}{chapter.6}%
+\contentsline {section}{\numberline {6.1}re-telling of the paper}{6}{section.6.1}%
+\contentsline {section}{\numberline {6.2}high-level overview of experimental results}{6}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Limitations}{6}{section.6.3}%
+\contentsline {section}{\numberline {6.4}what future work could accomplish}{6}{section.6.4}%
+\contentsline {section}{\numberline {6.5}final words}{6}{section.6.5}%
+\contentsline {chapter}{\chapternumberline {7}latex features}{7}{chapter.7}%

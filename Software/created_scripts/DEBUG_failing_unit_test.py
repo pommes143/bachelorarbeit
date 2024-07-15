@@ -22,7 +22,7 @@ class TestContainsNegative(unittest.TestCase):
         self.assertTrue(contains_negative([-1]))
         self.assertFalse(contains_negative([0]))
         self.assertTrue(contains_negative([-0.5, 0.1, 0.9]))
-        self.assertTrue(contains_negative([-0.0, 1.0]))
+        self.assertTrue(contains_negative([-1.0, 1.0]))
 
 if __name__ == '__main__':
     unittest.main()

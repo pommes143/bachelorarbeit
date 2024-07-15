@@ -1,0 +1,138 @@
+\documentclass[a4paper,11pt,oneside]{memoir}
+
+\ifpdf
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\fi
+
+\usepackage[english]{babel}
+
+% This is the only file needed for actually using the smart-thesis style.
+\input{style}
+
+% Contains some packages which are commonly used in a thesis.
+% Note that these are optional.
+\input{common-packages}
+
+% Contains some macros which are commonly used in a thesis.
+% Note that these are optional.
+\input{common-macros}
+
+% These packages are only used in the demo and not necessarily
+% required for smart-thesis.
+\usepackage{blindtext}
+
+% Loads bibliography for citations.
+\addbibresource{demo-bibliography.bib}
+
+% Starts creation of a glossary.
+\makeglossaries
+\input{demo-glossary}
+
+% Define all the metadata to be listed in \smarttitle and \smartcopyright
+\thesistype{Beachelor Thesis}
+\discipline{Kognitive Informatik}
+\title{Systematic Generation of Unit-Tests with different LLMs and prompt-design}
+\author{Richard Pamies}
+\institution{University of Bielefeld}
+\supervisors{Prof.\@~Dr.-Ing.\@~Benjamin Paaßen,M.Sc.\@~Jesper Dannat}
+
+\begin{document}
+
+\frontmatter
+
+\smarttitle
+
+\newpage
+\tableofcontents
+
+\mainmatter
+
+\chapter{Introduction}
+Unit-test are really important and useful. But most often those tests don't get written because of laziness, so the automatic generation of those tests arise as a possible solution.
+\\
+Large Language Models (LLMs) offer for the the possibility of creating useful unit-tests. But those generated test are flawed because those LLMs dont work with reason, but instead the statistically most probable answer.
+\\
+Prior work  has tried under different circumstances to solve this problem.[paper 1,2,3].
+
+\\
+My goal in this paper is to work out if prompt design by the LLM makes sense, and which LLMs, paired with which prompt design, provide the best answers.
+
+\chapter{Background and related work}
+\section{Unit-tests}
+Unit-tests are tests written for already existing code to make sure the implemented functionalities still work after further work on the code is done.\\The usefulness of unit-test is not controversial. Rather the time it takes to write them and the metrics used to test their usefulness. \\\\
+Code coverage and statement coverage is often mentioned when talking about validating unit-tests. --Talking about the mechanisms of both and why they are not enough--\\\\
+Here come other metrics i use in my work and their pros and cons:\\
+mutation coverage\\
+assert count and variaty\\
+\section{LLMs}
+An llm is only as good as its architecture and its training data. Generating unit-tests for mainstream code might be sufficient. But it is really easy to write code which covers niche subjects. And in those cases the LLM would need critical thinking, understanding and reasoning to fully understand the code and write useful and encompassing unit-tests.
+\subsection{GPT}
+\section{related work}
+
+\chapter{Methods}
+\section{high level description of my approach}
+I used the API-endpoints of different LLMs to send a structured prompt to those and receive code which should be the unit-test. Then i execute the unit
+\\The sequence of my approach to generate these unit-tests is:
+\begin{enumerate}
+\itemsep-1.5em
+\item refining a prompt by the LLM\\
+\item sending a prompt to the LLM\\
+\item receiving solution and extracting the unit-test\\
+\item executing the unit-test\\
+\item re-sending the prompt with appended error msg if the unit-test fails\\
+\item re-sending the unit-test with the instruction to remove the defective line\\
+\end{enumerate}
+
+\\The structured prompt could look like this:
+\\ \noindent\fbox{\begin{minipage}{\textwidth}
+\paragraph{Lemma} Let the coefficients of the polynomial
+$$a_0+a_1x+a_2x^2+\cdots+a_{m-1}x^{m-1}+x^m$$ be integers. 
+Then any real root of the polynomial is either integral or irrational.
+\end{minipage}}\\\\\\
+This 
+high level description
+what it should accomplish
+detailed description for reproduction for experienced user
+use illustrating diagrams as much as possible
+(no source code, but perhaps pseudo code)
+provide a good reason for each design choice(source or math)
+use a running example to illustrate the steps
+\section{provide overview diagram illustrating my steps}
+
+\chapter{Implementation}
+\section{ for each of the steps how it was implemented in the code}
+
+\chapter{Experiments}
+\section{what i want to show}
+\section{how i want to show it}
+\section{baselines and assumptions}
+\section{what was my initial assumption}
+\section{Table for experiments}
+\section{Discussion of the results}
+
+\chapter{Conclusion}
+\section{re-telling of the paper}
+\section{high-level overview of experimental results}
+\section{Limitations}
+\section{what future work could accomplish}
+\section{final words}
+		
+			
+\chapter{latex features}
+sparse\footnote{This is a footnote}
+
+Did you know? The discrete fourier transformation shown in equation \ref{eqn:dft} is the backbone of the modern information-society.
+		
+\begin{align}
+	f_m  \label{eqn:dft}
+\end{alig
+n}
+For words of science, see \cite{botsch2010polygon}. Unfortunately, that book has nothing about \glspl{wolf}.
+
+\backmatter
+\printglossaries
+\printbibliography[heading=bibintoc]
+
+\end{document}
+

@@ -1,6 +1,8 @@
 from openai import OpenAI
 import subprocess, sys
 from datetime import datetime
+import json
+import os
 
 INIT_PROMPT_FOR_CREATING_A_UNIT_TEST="prompts/init_prompt.txt"
 FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
@@ -30,9 +32,29 @@ def does_the_unit_test_run_successfully(filename):
     
 def measure_code_coverage(filename):
     print("Measuring code coverage")
-    subprocess.call(f"coverage run {filename} ", shell = True, executable="/bin/sh")
-    subprocess.call(f"coverage report ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage run --branch {filename} ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage json ", shell = True, executable="/bin/sh")
     subprocess.call(f"coverage erase", shell = True, executable="/bin/sh")
+    try:
+        with open('coverage.json') as f:
+            d = json.load(f)
+            print(f"code coverage: {d["totals"]["percent_covered"]}")
+            print(f"branch coverage: {d["totals"]["covered_branches"]/d["totals"]["num_branches"]}")
+
+    except:
+        print("couldnt find coverage json results")
+
+def measure_mutation_score(code_filename,test_filename):
+    subprocess.call(f"mutmut run --paths-to-mutate {code_filename} --tests-dir {test_filename}", shell = True, executable="/bin/sh")
+
+def measure_code_complexity(code_filename):
+    subprocess.call(f"radon cc -j --output-file 'complexity.json' {code_filename}", shell = True, executable="/bin/sh")
+    try:
+        with open('complexity.json') as f:
+            d = json.load(f)
+            print(f"the complexity rank is: {d["created_scripts/classes_to_test/contains_negative.py"][0]["rank"]}")
+    except:
+        print("couldnt find complexity json results")
 
 def extract_code_from_prompt(returned_string):
     start = '```'
@@ -80,6 +102,27 @@ def construct_prompt_for_failed_unit_test():
 
     return prompt
     
+def process_folders(main_folder):
+    result = []
+    for subfolder in os.listdir(main_folder):
+        subfolder_path = os.path.join(main_folder, subfolder)
+        if os.path.isdir(subfolder_path):
+            prompt_file = os.path.join(subfolder_path, "prompt")
+            if os.path.exists(prompt_file):
+                with open(prompt_file, 'r') as file:
+                    content = file.read()
+                sections = content.split('#')[1:]  
+                subfolder_data = [subfolder]
+                for section in sections:
+                    lines = section.strip().split('\n')
+                    key = lines[0].lower()
+                    value = '\n'.join(lines[1:]).strip()
+                    if key == 'testexamples':
+                        value = value.split('\n\n')
+                    subfolder_data.append([key, value])
+                result.append(subfolder_data)
+    return result
+
 if __name__ == "__main__":
     print("Sending prompt to gpt to create Unit-Test:")
     prompt = read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
@@ -88,11 +131,11 @@ if __name__ == "__main__":
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
     
     if(unit_test_bool):
-        #print_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST)
         print("SUCCESS! Unit-test generation was successful\n")
         measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
-
-
+        #measure_mutation_score(FILENAME_OF_INIT_CREATED_UNIT_TEST,"created_scripts/classes_to_test/contains_negative.py")
+        measure_code_complexity("created_scripts/classes_to_test/contains_negative.py")
+    
     if(not unit_test_bool):
         print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
         created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test()))

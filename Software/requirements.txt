@@ -1,3 +1,8 @@
 openai
 unittest2
 coverage
+mutmut
+importlib
+pytest
+radon
+coverage-threshold

@@ -1,6 +1,6 @@
 #!function!#
 def contains_negative(numbers):
-#!prefix!#
+#!prefix!# 
     return any(num < 0 for num in numbers)
 
 if __name__ == '__main__':

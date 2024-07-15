@@ -1,81 +1,47 @@
-from openai import OpenAI
-import subprocess, sys
+import os
 
-
-def extract_code_from_prompt(returned_string):
-    start = '```'
-    end = '```'
-    if((start in returned_string) and (end in returned_string)):
-        s = returned_string
-        s = s[s.find(start)+len(start):s.rfind(end)]
-        returned_string = s[s.index('\n')+1:]
-
-    if((start in returned_string) or (end in returned_string)):
-        returned_string = returned_string.replace(start,"").replace(end,"")
+def process_folders(main_folder):
+    result = []
+    
+    for subfolder in os.listdir(main_folder):
+        subfolder_path = os.path.join(main_folder, subfolder)
         
-    if("python" in returned_string.split()[:5]):
-        returned_string = returned_string.replace("python","")
-    return returned_string
-
-def construct_prompt_for_failed_unit_test():
-    prompt="""
-    Another Amateur Programmer wrote this Unit-Test and the Unit-Test failed.
-    Below is the Unit-Test and the error Message.
-    Prove that you are an outstanding Programmer and fix this Unit Test.    
-    In the end, I want a compiling Python program with all necessary imports.
-
-    """
-    prompt += "This ist the Unit-Test that was written and failed:\n"
-    with open('created_scripts/failing_unit_test.py', 'r') as file:
-        data = file.read()
-        prompt = prompt + data
-
-    prompt += "\nAnd that is the error message:\n"
-    with open('testLogging.txt', 'r') as file:
-        data = file.read()
-        print(data)
-        prompt = prompt + data
-
-    prompt += """To fix this unit-test remove only the specific line containing the error."""
-    return prompt
-
-def send_prompt_to_model(prompt):
-    client = OpenAI(api_key="")
-    print("Sending prompt!")
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": """You are an outstanding programmer, 
-            but secluded and efficient. As a professional programmer you answer 
-            as concise and precise as possible without any unnecessary words"""},
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-        model="gpt-3.5-turbo",
-    )
-    #with open(f"prompts/recorded_output_{datetime.now().strftime("%H:%M:%S")}","w") as file:
-    #    file.write(chat_completion.choices[0].message.content)
-    print("Received result from chat-gpt")
-    return chat_completion.choices[0].message.content
-
-if __name__ == "__main__":
-    returnVal = subprocess.call(f"./start.sh created_scripts/failing_unit_test.py &> testLogging.txt", shell = True, executable="/bin/sh")
-    print("-Unit Test generation Failed!:")
-    prompt = construct_prompt_for_failed_unit_test()
-    #### send prompt with error msg again to LLM
-    # formulate a prompt to direct another person what exactly needs to change and why
-
-    print("----------------------")
-    returned_python_unit_test = extract_code_from_prompt(send_prompt_to_model(prompt))
-    with open("created_scripts/test-script-fixed.py","w") as file:
-        file.write(returned_python_unit_test)
-    print("\n#############################################################\n")
-    print("-Running fixed unit-test:")
-    returnVal = subprocess.call(f"./start.sh created_scripts/test-script-fixed.py > testLogging.txt", shell = True, executable="/bin/sh")
-    with open("testLogging.txt","r") as file:
-        print(file.read())
-
-
+        if os.path.isdir(subfolder_path):
+            prompt_file = os.path.join(subfolder_path, "prompt")
             
+            if os.path.exists(prompt_file):
+                with open(prompt_file, 'r') as file:
+                    content = file.read()
+                
+                sections = content.split('#')[1:]  # Split by '#' and remove the first empty element
+                
+                subfolder_data = [subfolder]
+                for section in sections:
+                    lines = section.strip().split('\n')
+                    key = lines[0].lower()
+                    value = '\n'.join(lines[1:]).strip()
+                    
+                    if key == 'testexamples':
+                        value = value.split('\n\n')
+                    
+                    subfolder_data.append([key, value])
+                
+                result.append(subfolder_data)
+    
+    return result
 
+if __name__ == '__main__':
+    result = process_folders("/home/rpommes/1Zentrum/Uni/24SoSe/Bachelorarbeit/Intro_to_Python/task_folder/")
+    print(result) 
+    for x in range(len(result)):
+        print("-"*50)
+        print("\n\n")
+        print(x)
+        for elem in result[x]:
+            if(elem[0] == "testexamples"):
+                for elem2 in elem[1]:
+                    print(elem2)
+                    print("\n")  
+            else:
+                print(elem)
+                print("\n\n")
