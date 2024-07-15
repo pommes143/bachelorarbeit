@@ -10,6 +10,7 @@ FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
 FILENAME_OF_INIT_CREATED_UNIT_TEST="created_scripts/created_unit_test.py"
 FILENAME_OF_THE_FIXED_INIT_UNIT_TEST="created_scripts/test-script-fixed.py"
 LOGGING_OF_LAST_EXECUTED_UNIT_TEST="logging/testLogging.txt"
+FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES="/home/rpommes/1Zentrum/Uni/24SoSe/Bachelorarbeit/Intro_to_Python/task_folder/"
 
 def write_to_file(filename, string_to_be_written):
     with open(filename, 'w') as file:
@@ -52,7 +53,7 @@ def measure_code_complexity(code_filename):
     try:
         with open('complexity.json') as f:
             d = json.load(f)
-            print(f"the complexity rank is: {d["created_scripts/classes_to_test/contains_negative.py"][0]["rank"]}")
+            print(f"the complexity rank is: {d[f"created_scripts/{code_filename}"][0]["rank"]}")
     except:
         print("couldnt find complexity json results")
 
@@ -123,9 +124,36 @@ def process_folders(main_folder):
                 result.append(subfolder_data)
     return result
 
+def create_init_prompt(base_prompt,index):
+    result = process_folders(FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES)
+    filename = "example_solution.py"
+    subfolder_name = str(result[index][0])+"/"
+    print(f"The actual Task is: {subfolder_name}")
+    for elem in result[index]:
+        if(elem[0] == "taskdescription"):
+            base_prompt += f"\n\n#This is the taskdescription:\n{elem[1]}\n\n"
+        if(elem[0] == "filename"):
+            filename = str(elem[1])
+        if(elem[0] == "functionname"):
+            base_prompt += f"#This is the functionname:\n{elem[1]}\n\n"
+        if(elem[0] == "testexamples"):
+            base_prompt += f"#These are the {len(elem[1])} testexamples:"
+            for examples in elem[1]:
+                base_prompt += "\n"+str(examples)+"\n"
+        
+    
+    FILENAME_OF_THE_CODE_OF_WHICH_A_TEST_SHOULD_BE_GENERATED=f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
+    base_prompt += "\n#This is the written code:\n"
+    base_prompt += read_from_file(FILENAME_OF_THE_CODE_OF_WHICH_A_TEST_SHOULD_BE_GENERATED)
+    base_prompt += f"\n\nthe code is located in the file {filename}"
+    #print(base_prompt)
+    #print(filename)
+    return base_prompt, f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
+
 if __name__ == "__main__":
     print("Sending prompt to gpt to create Unit-Test:")
-    prompt = read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
+    prompt,file_location = create_init_prompt(read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST),int(sys.argv[1]))
+    subprocess.call(f"cp {file_location} created_scripts/example_solution.py", shell = True, executable="/bin/sh")
     created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
     write_to_file(FILENAME_OF_INIT_CREATED_UNIT_TEST,created_python_unit_test_by_llm)
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
@@ -134,7 +162,7 @@ if __name__ == "__main__":
         print("SUCCESS! Unit-test generation was successful\n")
         measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
         #measure_mutation_score(FILENAME_OF_INIT_CREATED_UNIT_TEST,"created_scripts/classes_to_test/contains_negative.py")
-        measure_code_complexity("created_scripts/classes_to_test/contains_negative.py")
+        measure_code_complexity("created_scripts/example_solution.py")
     
     if(not unit_test_bool):
         print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")

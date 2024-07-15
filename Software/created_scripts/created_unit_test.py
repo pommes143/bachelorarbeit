@@ -1,37 +1,18 @@
-import unittest
-from classes_to_test.contains_negative import contains_negative
+import numpy as np
+import example_solution
 
-class TestContainsNegative(unittest.TestCase):
+def test_trigonometry():
+    angle_array1 = np.array([0, 30, 45, 60])
+    sine_values1, cosine_values1, tangent_values1 = example_solution.trigonometry(angle_array1)
+    expected_sine1 = np.array([0.0, 0.5, np.sqrt(2)/2, np.sqrt(3)/2])
+    assert np.allclose(sine_values1, expected_sine1), "Sinus (positive) values are calculated not correctly."
 
-    def test_contains_negative_with_negative_numbers(self):
-        self.assertTrue(contains_negative([13, 324, 123, 87, -4545, 8878, 45]))
+    angle_array2 = np.array([150, 120, 90, 60])
+    sine_values2, cosine_values2, tangent_values2 = example_solution.trigonometry(angle_array2)
+    expected_sine2 = np.array([np.sin(np.deg2rad(150)), np.sin(np.deg2rad(120)), np.sin(np.deg2rad(90)), np.sin(np.deg2rad(60)])
+    assert np.allclose(sine_values2, expected_sine2), "Sinus (negative angle) values are calculated not correctly."
 
-    def test_contains_negative_without_negative_numbers(self):
-        self.assertFalse(contains_negative([2, 1123, 233]))
-
-    def test_contains_negative_with_floats(self):
-        self.assertTrue(contains_negative([13, 324, 123, 87, -45.45, 8878, 45]))
-
-    def test_contains_negative_with_mixed_integers_and_floats(self):
-        self.assertTrue(contains_negative([13, 324, 123, 87, -45.45, 8878, 45, -10]))
-
-    def test_contains_negative_with_empty_list(self):
-        self.assertFalse(contains_negative([]))
-
-    def test_contains_negative_with_zero(self):
-        self.assertFalse(contains_negative([0]))
-
-    def test_contains_negative_with_negative_zero(self):
-        self.assertTrue(contains_negative([-0]))
-
-    def test_contains_negative_with_negative_inf(self):
-        self.assertTrue(contains_negative([-float('inf')]))
-
-    def test_contains_negative_with_positive_inf(self):
-        self.assertFalse(contains_negative([float('inf')]))
-
-    def test_contains_negative_with_nan(self):
-        self.assertFalse(contains_negative([float('nan')]))
-
-if __name__ == '__main__':
-    unittest.main()
+    angle_array3 = np.array([-30, -45, -60])
+    sine_values3, cosine_values3, tangent_values3 = example_solution.trigonometry(angle_array3)
+    expected_sine3 = np.array([np.sin(np.deg2rad(-30)), np.sin(np.deg2rad(-45)), np.sin(np.deg2rad(-60)])
+    assert np.allclose(sine_values3, expected_sine3), "Sinus (negative angle) values are calculated not correctly."

@@ -1,22 +1,4 @@
-Below is a docstring that describes a function, 
-the function that implements it and its use-cases.
-Now your job is to create in-depth Unit tests for the code below.
-Also think to cover the hidden implicit edge-cases.
-Only Work with Integers or Floats.
-
-#docstring
-Create a function that checks if a given list of numbers contains any negative numbers. 
-The function should return True if there are negative numbers and False otherwise. 
-(**HINT** you can use "any()" to check the list)
-
-#file_name to import
-contains_negative.py
-that file is in a subfolder named "classes_to_test"
-
-#function
-def contains_negative(numbers):
-    return any(num < 0 for num in numbers)
-
-#Use-Cases
-contains_negative([13,324,123,87,-4545,8878,45])
-contains_negative([2,1123,233])
+The things above are the parts of the description of a programming task.
+Now write me a Unit test in python for to validate the code that was given above.
+Think of the imports. 
+Be thourough.

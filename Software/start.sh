@@ -1,3 +1,3 @@
 #!/bin/sh
 source .venv/bin/activate
-python3 $1
+python3 $1 $2
