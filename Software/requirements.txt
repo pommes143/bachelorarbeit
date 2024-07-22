@@ -5,4 +5,5 @@ mutmut
 importlib
 pytest
 radon
+numpy
 coverage-threshold

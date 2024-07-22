@@ -1,14 +1,14 @@
 #!function!#
 import numpy as np 
-def trigonometry(angle_array):
+def apply_mask(input_array, mask):
 #!prefix!#
-    # Convert degrees to radians
-    angle_radians = np.deg2rad(angle_array)
+    if input_array.shape != mask.shape:
+        return None  # Return None for mismatched shapes
     
-    # Calculate sine, cosine, and tangent
-    sine_values = np.sin(angle_radians)
-    cosine_values = np.cos(angle_radians)
-    tangent_values = np.tan(angle_radians)
-    
-    return sine_values, cosine_values, tangent_values
+    # Invert the input mask
+    inverted_mask = ~mask
 
+    # Use the inverted mask to select elements from the input array
+    result_array = input_array[inverted_mask]
+
+    return result_array

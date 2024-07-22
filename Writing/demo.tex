@@ -54,42 +54,40 @@ Unit-test are really important and useful. But most often those tests don't get 
 Large Language Models (LLMs) offer for the the possibility of creating useful unit-tests. But those generated test are flawed because those LLMs dont work with reason, but instead the statistically most probable answer.
 \\
 Prior work  has tried under different circumstances to solve this problem.[paper 1,2,3].
-
 \\
-My goal in this paper is to work out if prompt design by the LLM makes sense, and which LLMs, paired with which prompt design, provide the best answers.
+My goal in this work is to:\\
+\begin{enumerate}
+%\itemsep-1.5em
+\item measure the code coverage and statement coverage of generated unit-test
+\item generate these unit-tests with different LLMs
+\item generate these unit-tests with different prompt design strategies
+\end{enumerate}
+and then at the end i want to compare the different approaches.
 
 \chapter{Background and related work}
 \section{Unit-tests}
-Unit-tests are tests written for already existing code to make sure the implemented functionalities still work after further work on the code is done.\\The usefulness of unit-test is not controversial. Rather the time it takes to write them and the metrics used to test their usefulness. \\\\
-Code coverage and statement coverage is often mentioned when talking about validating unit-tests. --Talking about the mechanisms of both and why they are not enough--\\\\
-Here come other metrics i use in my work and their pros and cons:\\
-mutation coverage\\
-assert count and variaty\\
+Unit-tests are tests written for already existing code to make sure the implemented functionalities still work after further work on the code is done. The usefulness of unit-tests is not controversial. Rather the time it takes to write them and the metrics used to test their usefulness. 
+Code coverage and statement coverage are two well-known and often used metrics in the context of unit-tests. There are more metrics like the mutation-score but code and statement coverage are the most implemented and available.
+For all metrics concerning unit-test and above it is important to keep in mind that there a no metrics that can be used to guarantee bug-free code. It is more an indication of where more tests might be needed rather than making any statement about the quality and conceptual coverage that the tests provide for the actual code.
+So in the end there are no perfect, singular metrics that can be used to assess the quality and conceptual coverage of unit-tests. Experience and the combined use of several different metrics to arrive at an indication is the best way to create high-quality unit-tests.
+\subsection{code coverage}
+Code coverage is a measure of how much of a program's source code is executed during testing. It works by tracking which lines of code, functions, or branches are run when tests are performed.  
+\subsection{statement coverage}
+Statement coverage on the other hand measures the percentage of executable statements in a program that are executed during testing. However, it has limitations as it doesn't account for different paths through decision points
+\subsection{mutation coverage}
+Mutation score is a measure of test effectiveness that assesses how well tests detect intentional code changes made by mutations. It works by automatically introducing small alterations to the source code, such as changing operators or variable values, and then running the test. The score is the percentage of mutations detected by failing tests. Mutation score is important because it evaluates the quality and sensitivity of tests, revealing weaknesses in test cases that other metrics might miss. A high mutation score suggests that tests are good at catching potential bugs. However, generating and testing mutations can be computationally expensive.
+\subsection{cyclomatic code complexity}
+Cyclomatic complexity is a software metric that measures the number of linearly independent paths through a program's source code. It works by analyzing the control flow graph of a program, counting decision points like if statements and loops. A higher cyclomatic complexity indicates more complex code. This metric is important because it helps identify overly complicated functions or methods that may be difficult to test, maintain, or understand. 
 \section{LLMs}
-An llm is only as good as its architecture and its training data. Generating unit-tests for mainstream code might be sufficient. But it is really easy to write code which covers niche subjects. And in those cases the LLM would need critical thinking, understanding and reasoning to fully understand the code and write useful and encompassing unit-tests.
+Large Language Models(LLMs) are computational models that normaly used an enormous data set for learning and are able to achieve general-purpose language generation and other tasks like categorization and other multi-modal tasks. An LLM is only as good as its architecture and its training data. 
+In the case of unit-tests
+Generating unit-tests for mainstream code might be sufficient. But it is really easy to write code which covers niche subjects. And in those cases the LLM would need critical thinking, understanding and reasoning to fully understand the code and write useful and encompassing unit-tests.
 \subsection{GPT}
+ChatGPT is an advanced conversational AI model developed by OpenAI. It works by using a large language model trained on diverse internet text to generate human-like responses to user inputs. ChatGPT can engage in dialogue, answer questions, and assist with various tasks across multiple domains.
+\subsection{Open source models}
 \section{related work}
 
 \chapter{Methods}
-\section{high level description of my approach}
-I used the API-endpoints of different LLMs to send a structured prompt to those and receive code which should be the unit-test. Then i execute the unit
-\\The sequence of my approach to generate these unit-tests is:
-\begin{enumerate}
-\itemsep-1.5em
-\item refining a prompt by the LLM\\
-\item sending a prompt to the LLM\\
-\item receiving solution and extracting the unit-test\\
-\item executing the unit-test\\
-\item re-sending the prompt with appended error msg if the unit-test fails\\
-\item re-sending the unit-test with the instruction to remove the defective line\\
-\end{enumerate}
-
-\\The structured prompt could look like this:
-\\ \noindent\fbox{\begin{minipage}{\textwidth}
-\paragraph{Lemma} Let the coefficients of the polynomial
-$$a_0+a_1x+a_2x^2+\cdots+a_{m-1}x^{m-1}+x^m$$ be integers. 
-Then any real root of the polynomial is either integral or irrational.
-\end{minipage}}\\\\\\
 This 
 high level description
 what it should accomplish
@@ -98,12 +96,71 @@ use illustrating diagrams as much as possible
 (no source code, but perhaps pseudo code)
 provide a good reason for each design choice(source or math)
 use a running example to illustrate the steps
+\section{LLMs}
+I used chat-gpt(GPT) 3.5, GPT 4o, OPEN_SOURCE and OPEN_SOURCE. 
+I used GPT because of its accessibility and prominence and to expand my range i also included the open source models
+For all of these i used an API endpoint to send my prompts to and in the case of the open source models i used my own desktop PC for running the models and hosting the API endpoint.
+These LLMs are the core component that return generated code through prompts and are each more or less capable in the different capabilities necessary to generate unit-tests. 
+\section{Prompt-design}
+A strong leverage to control the resulting output quality of LLMs is prompt-design. Prompt-design describes the mostly iterative, model-specific and experience driven design process of how the textual input prompt is worded and structured to achieve the optimal result.
+In my experiments i validated my prompts with an example exercise and GPT 3.5. 
+My prompt, that was send in the end to the model, consisted of four parts that were togglable:
+\begin{enumerate}
+%\itemsep-1.5em
+\item My static initialization prompt, which instructed the model to generate a unit-test with the information's available.
+\item A Task description, that was copied from the Task description and, if necessary, slightly adjusted.
+\item The code of the example solution, 
+\item The function name and signature,
+\item Unit-test examples of the example unit-test,
+\item The error message in the case of failure, so that errors could in the best case be specifically addressed and fixed.
+\end{enumerate}
+
+
+There were two main static prompts needed for my application:
+\begin{itemize}
+%\itemsep-1.5em
+\item The instruction prompt, that combined with the dynamically read task attributes forms the prompt for the model. 
+
+\\ \noindent\fbox{\begin{minipage}{\textwidth}
+\paragraph{Instruction prompt}
+The things above are the parts of the description of a programming task.
+Now write me a Unit test in python for to validate the code that was given above.
+Think of the imports. 
+Be thorough.
+\end{minipage}}\\
+I was forced to re-design the prompt a few times because GPT 3.5 was  suddenly forgetting, or misunderstanding important aspects. Examples were that suddenly no code was generated, only a textual directive on how to write a unit-test.
+
+\item The role description, which describes the role of the model in the interaction. I mainly used the role description to control the output of the model.
+\\ \noindent\fbox{\begin{minipage}{\textwidth}
+\paragraph{Role description:}
+You are an outstanding programmer, 
+but secluded and efficient. As a professional programmer you answer as concise and precise as possible without any unnecessary words
+\end{minipage}}\\
+This resulted in comparatively reliable results where the amount of unnecessary  text was reduced.
+ 
+\end{itemize}
+
+\section{Training-data}
+I received 22 exercises which were exercises for the python entry course of Prof. Paaßen. Each of the 22 folders contained at least a Task description,an example unit-test and an example solution for the code. 
+\section{Pre-processing}
+I prepared each of the 22 Tasks manually by creating a "prompt" text-file and pasting the information's that are necessary in defined categories. That enabled me to then parse the information's for each task programmatically.
+\section{Post-processing and validation}
+When receiving the code i wrote a small parser that extracted the code from the resulting string and put that into a temporary file to run the unit-test.
+The unit-test was then tested and the return value determined if a new attempt was to be made.
+\section{Strategies for failures}
+If the generated unit-test did not execute correctly although it should have, a new prompt is send to the model accompanied by the produced error message. 
+
+If after that the result still doesn't compile, another prompt is send with the query to remove the faulty line. That is done to at least have a compiling test result in the end.
+\\The structured prompt could look like this:
+
+
 \section{provide overview diagram illustrating my steps}
 
 \chapter{Implementation}
-\section{ for each of the steps how it was implemented in the code}
+\section{ Code examples}
 
 \chapter{Experiments}
+\section{baselines}
 \section{what i want to show}
 \section{how i want to show it}
 \section{baselines and assumptions}
@@ -118,8 +175,15 @@ use a running example to illustrate the steps
 \section{what future work could accomplish}
 \section{final words}
 		
+\newpage
 			
 \chapter{latex features}
+\\ \noindent\fbox{\begin{minipage}{\textwidth}
+\paragraph{Lemma} Let the coefficients of the polynomial
+$$a_0+a_1x+a_2x^2+\cdots+a_{m-1}x^{m-1}+x^m$$ be integers. 
+Then any real root of the polynomial is either integral or irrational.
+\end{minipage}}\\\\\\
+
 sparse\footnote{This is a footnote}
 
 Did you know? The discrete fourier transformation shown in equation \ref{eqn:dft} is the backbone of the modern information-society.

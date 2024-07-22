@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Fedora 40) (preloaded format=pdflatex 2024.7.9)  15 JUL 2024 11:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Fedora 40) (preloaded format=pdflatex 2024.7.9)  18 JUL 2024 16:11
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1953,72 +1953,98 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 6.25204pt on input line 48.
  (./demo.toc) [2]
+Underfull \hbox (badness 10000) in paragraph at lines 52--61
 
-! LaTeX Error: There's no line here to end.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.59 M
-      y goal in this paper is to work out if prompt design by the LLM makes ...
-
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
+ []
 
 [1
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 63--68
 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 63--68
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 63--68
-
- []
+LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
+(Font)              using `T1/pplj/m/sc' instead on input line 73.
 
 
 LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
-(Font)              using `T1/pplj/m/sc' instead on input line 70.
+(Font)              using `T1/pplj/m/sc' instead on input line 75.
+
+
+LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
+(Font)              using `T1/pplj/m/sc' instead on input line 77.
 
 [2
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 79--80
 
+LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
+(Font)              using `T1/pplj/m/sc' instead on input line 79.
+
+
+LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
+(Font)              using `T1/pplj/m/sc' instead on input line 85.
+
+
+LaTeX Font Warning: Font shape `T1/pplj/m/scit' undefined
+(Font)              using `T1/pplj/m/sc' instead on input line 87.
+
+[3]
+! Missing $ inserted.
+<inserted text> 
+                $
+l.100 I used chat-gpt(GPT) 3.5, GPT 4o, OPEN_
+                                             SOURCE and OPEN_SOURCE.
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.104 \section
+              {Prompt-design}
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (1995.23914pt too wide) in paragraph at lines 100--104
+\T1/pplx/m/n/10.95 (-20) I used chat-gpt(GPT) 3.5, GPT 4o, OPEN$[]\OML/zplm/m/i
+t/10.95 OURCEandOPEN[]OURCE\OT1/pplx/m/n/10.95 (-20) .\OML/zplm/m/it/10.95 Iuse
+dGPTbecauseofitsaccessibilityandprominenceandtoexpandmyrangeialsoincludedtheope
+nsourcemodelsForalloftheseiusedanAPIendpointtosendmypromptstoandinthecaseoftheo
+pensourcemodelsiusedmyowndesktopPCforrunningthemodelsandhostingtheAPIendpoint\O
+T1/pplx/m/n/10.95 (-20) .\OML/zplm/m/it/10.95 TheseLLMsarethecorecomponentthatr
+eturngeneratedcodethroughpromptsandareeachmoreorlesscapableinthedifferentcapabi
+litiesnecessarytogenerateunit \OMS/zplm/m/n/10.95 ^^@
  []
 
+LaTeX Font Info:    Trying to load font information for TS1+pplx on input line 
+122.
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pplx.fd
+File: ts1pplx.fd 2004/09/06 font definitions for TS1/pplx.
+)
 
-Underfull \hbox (badness 10000) in paragraph at lines 80--81
+! LaTeX Error: There's no line here to end.
 
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.124 \\ \noindent
+                  \fbox{\begin{minipage}{\textwidth}
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+Overfull \hbox (34.17505pt too wide) in paragraph at lines 124--132
+[] 
  []
 
+[4
 
-Underfull \hbox (badness 10000) in paragraph at lines 81--82
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 82--83
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 83--84
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 84--85
-
+]
+Overfull \hbox (34.17505pt too wide) in paragraph at lines 133--140
+[] 
  []
 
 
@@ -2028,58 +2054,61 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.87 \\T
-        he structured prompt could look like this:
+l.155 \\T
+         he structured prompt could look like this:
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 
-Overfull \hbox (6.79999pt too wide) in paragraph at lines 87--101
+Overfull \hbox (6.79999pt too wide) in paragraph at lines 155--161
 [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--101
+Underfull \hbox (badness 10000) in paragraph at lines 155--161
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--101
+Underfull \hbox (badness 10000) in paragraph at lines 155--161
 
  []
 
-[3
 
-] [4
+Underfull \hbox (badness 10000) in paragraph at lines 155--161
 
-] [5
+ []
 
-] [6
+[5] [6] [7
+
+] [8
+
+] [9
 
 ]
 
-! LaTeX Error: \begin{align} on input line 127 ended by \end{alig n}.
+! LaTeX Error: \begin{align} on input line 188 ended by \end{alig n}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.130 n}
+l.191 n}
         
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 
-LaTeX Warning: Citation 'botsch2010polygon' on page 7 undefined on input line 1
-31.
+LaTeX Warning: Citation 'botsch2010polygon' on page 10 undefined on input line 
+192.
 
-[7
+[10
 
 ] (./demo.gls) (./demo.acr)
 
-LaTeX Warning: Empty bibliography on input line 135.
+LaTeX Warning: Empty bibliography on input line 196.
 
 \tf@toc=\write10
 \openout10 = `demo.toc'.
@@ -2089,7 +2118,7 @@ LaTeX Warning: Empty bibliography on input line 135.
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `demo.out' has not changed.
-(rerunfilecheck)             Checksum: DCF9E64CB321B155E6FD97CA30AD70A8;1787.
+(rerunfilecheck)             Checksum: 73C8101A53AF1B2E96AE7A3632A56114;2115.
 
 Package biblatex Warning: Please (re)run Biber on the file:
 (biblatex)                demo
@@ -2100,11 +2129,11 @@ Package logreq Info: Writing requests to 'demo.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 56048 strings out of 476034
- 1202513 string characters out of 5792855
- 2138922 words of memory out of 6000000
- 75312 multiletter control sequences out of 15000+600000
- 659519 words of font info for 357 fonts, out of 8000000 for 9000
+ 56153 strings out of 476034
+ 1203718 string characters out of 5792855
+ 2140927 words of memory out of 6000000
+ 75342 multiletter control sequences out of 15000+600000
+ 662388 words of font info for 396 fonts, out of 8000000 for 9000
  1137 hyphenation exceptions out of 8191
  104i,13n,97p,2285b,1953s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
@@ -2118,10 +2147,10 @@ ive/texmf-dist/fonts/type1/public/fpl/fplrc8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palati
 no/uplri8a.pfb>
-Output written on demo.pdf (9 pages, 108606 bytes).
+Output written on demo.pdf (12 pages, 122959 bytes).
 PDF statistics:
- 238 PDF objects out of 1000 (max. 8388607)
- 210 compressed objects within 3 object streams
- 46 named destinations out of 1000 (max. 500000)
- 120533 words of extra memory for PDF output out of 128383 (max. 10000000)
+ 293 PDF objects out of 1000 (max. 8388607)
+ 262 compressed objects within 3 object streams
+ 65 named destinations out of 1000 (max. 500000)
+ 124677 words of extra memory for PDF output out of 128383 (max. 10000000)
 
