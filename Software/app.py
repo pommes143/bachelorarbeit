@@ -162,12 +162,24 @@ def create_init_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_desc
     return base_prompt, f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
 
 if __name__ == "__main__":
+
+
+    """
+    setup:
+    defining parameters
+
+    actions
+
+    todo:
+    functions
+    outward util files to implement
+    """
     print("Sending prompt to gpt to create Unit-Test:")
     try:
         which_task_index = int(sys.argv[1])
     except:
         which_task_index = 2
-    redesign_promtp_by_llM = True
+    redesign_promtp_by_llM = False
 
     #create prompt
     init_prompt = read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
