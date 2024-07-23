@@ -1,1 +1,1 @@
-{"created_scripts/example_solution.py": [{"type": "function", "rank": "A", "complexity": 2, "col_offset": 0, "lineno": 3, "endline": 14, "name": "apply_mask", "closures": []}]}
+{"created_scripts/example_solution.py": [{"type": "function", "rank": "A", "complexity": 2, "col_offset": 0, "endline": 4, "name": "contains_negative", "lineno": 2, "closures": []}]}

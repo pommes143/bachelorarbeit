@@ -1,0 +1,4 @@
+The things above are the parts of the description of a programming task.
+Now write me a thourough prompt to write a unit test for this task.
+Be clear and in-depth about the cases which need assertions. 
+Let's think step by step.

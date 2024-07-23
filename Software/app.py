@@ -2,7 +2,7 @@ from openai import OpenAI
 import subprocess, sys
 from datetime import datetime
 import json
-import os
+from utils import *
 
 INIT_PROMPT_FOR_CREATING_A_UNIT_TEST="prompts/init_prompt.txt"
 FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
@@ -11,18 +11,6 @@ FILENAME_OF_INIT_CREATED_UNIT_TEST="created_scripts/created_unit_test.py"
 FILENAME_OF_THE_FIXED_INIT_UNIT_TEST="created_scripts/test-script-fixed.py"
 LOGGING_OF_LAST_EXECUTED_UNIT_TEST="logging/testLogging.txt"
 FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES="/home/rpommes/1Zentrum/Uni/24SoSe/Bachelorarbeit/Intro_to_Python/task_folder/"
-
-def write_to_file(filename, string_to_be_written):
-    with open(filename, 'w') as file:
-        file.write(string_to_be_written)
-
-def read_from_file(filename):
-    with open(filename, 'r') as file:
-        return file.read()
-    
-def print_from_file(filename):
-    with open(filename, 'r') as file:
-        print(file.read())
 
 def does_the_unit_test_run_successfully(filename):
     val =subprocess.call(f"./start.sh {filename} &> {LOGGING_OF_LAST_EXECUTED_UNIT_TEST}", shell = True, executable="/bin/sh")
@@ -61,21 +49,6 @@ def get_code_complexity(code_filename):
     except:
         print("couldnt find complexity json results")
 
-def extract_code_from_prompt(returned_string):
-    start = '```'
-    end = '```'
-    if((start in returned_string) and (end in returned_string)):
-        s = returned_string
-        s = s[s.find(start)+len(start):s.rfind(end)]
-        returned_string = s[s.index('\n')+1:]
-
-    if((start in returned_string) or (end in returned_string)):
-        returned_string = returned_string.replace(start,"").replace(end,"")
-        
-    if("python" in returned_string.split()[:5]):
-        returned_string = returned_string.replace("python","")
-    return returned_string
-
 def send_prompt_to_model(prompt):
     client = OpenAI(api_key="")
     print("Sending prompt!...")
@@ -91,8 +64,6 @@ def send_prompt_to_model(prompt):
         ],
         model="gpt-3.5-turbo",
     )
-    #with open(f"prompts/recorded_output_{datetime.now().strftime("%H:%M:%S")}","w") as file:
-    #    file.write(chat_completion.choices[0].message.content)
     print("...Received result from chat-gpt")
     return chat_completion.choices[0].message.content
 
@@ -107,28 +78,7 @@ def construct_prompt_for_failed_unit_test():
 
     return prompt
     
-def process_folders(main_folder):
-    result = []
-    for subfolder in os.listdir(main_folder):
-        subfolder_path = os.path.join(main_folder, subfolder)
-        if os.path.isdir(subfolder_path):
-            prompt_file = os.path.join(subfolder_path, "prompt")
-            if os.path.exists(prompt_file):
-                with open(prompt_file, 'r') as file:
-                    content = file.read()
-                sections = content.split('#')[1:]  
-                subfolder_data = [subfolder]
-                for section in sections:
-                    lines = section.strip().split('\n')
-                    key = lines[0].lower()
-                    value = '\n'.join(lines[1:]).strip()
-                    if key == 'testexamples':
-                        value = value.split('\n\n')
-                    subfolder_data.append([key, value])
-                result.append(subfolder_data)
-    return result
-
-def create_init_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_descr,incl_filename,incl_func_name,inc_test_examples,incl_code):
+def construct_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_descr,incl_filename,incl_func_name,inc_test_examples,incl_code):
     base_prompt =""
     result = process_folders(FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES)
     filename = "example_solution.py"
@@ -161,29 +111,9 @@ def create_init_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_desc
     
     return base_prompt, f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
 
-if __name__ == "__main__":
-
-
-    """
-    setup:
-    defining parameters
-
-    actions
-
-    todo:
-    functions
-    outward util files to implement
-    """
-    print("Sending prompt to gpt to create Unit-Test:")
-    try:
-        which_task_index = int(sys.argv[1])
-    except:
-        which_task_index = 2
-    redesign_promtp_by_llM = False
-
-    #create prompt
+def create_prompt(redesign_promtp_by_llM):
     init_prompt = read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
-    prompt,file_location = create_init_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=redesign_promtp_by_llM,
+    prompt,file_location = construct_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=redesign_promtp_by_llM,
                                                                             incl_task_descr=True,
                                                                             incl_filename=True,
                                                                             incl_func_name=True,
@@ -191,37 +121,70 @@ if __name__ == "__main__":
                                                                             incl_code=True)
     subprocess.call(f"cp {file_location} created_scripts/example_solution.py", shell = True, executable="/bin/sh")
     prompt += f"\nWrite at least {get_code_complexity("created_scripts/example_solution.py")} Assertions!"
-
     if(redesign_promtp_by_llM):
         prompt = send_prompt_to_model(prompt)
-        prompt,file_location = create_init_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=False,
+        prompt,file_location = construct_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=False,
                                                                                 incl_task_descr=True,
                                                                                 incl_filename=True,
                                                                                 incl_func_name=True,
                                                                                 inc_test_examples=False,
                                                                                 incl_code=False)#"""
-    print(prompt)
-    #send prompt
+    return prompt
+
+def send_prompt(prompt):
     created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
     write_to_file(FILENAME_OF_INIT_CREATED_UNIT_TEST,created_python_unit_test_by_llm)
-    unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
-    if(unit_test_bool):
-        print("SUCCESS! Unit-test generation was successful\n")
-        measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
-        #measure_mutation_score(FILENAME_OF_INIT_CREATED_UNIT_TEST,"created_scripts/classes_to_test/contains_negative.py")
-        
     
-    if(not unit_test_bool):
-        print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
-        created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test()))
-        write_to_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST,created_python_unit_test_by_llm)
-        unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
+def unit_test_was_a_success_first_try():
+    print("SUCCESS! Unit-test generation was successful\n")
+    measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
+    #measure_mutation_score(FILENAME_OF_INIT_CREATED_UNIT_TEST,"created_scripts/classes_to_test/contains_negative.py")
         
-        if(not unit_test_bool):
-            print("Fixing the Unit-Test did not work. Now the line containing the error is removed")
-            prompt = construct_prompt_for_failed_unit_test()
-            prompt += """To fix this unit-test remove only the specific line containing the error."""
-            created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
-        else:
-            print("Fixing the Unit-test was successfull")
-        measure_code_coverage(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
+def instruct_model_to_fix_unit_test():
+    print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
+    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test()))
+    write_to_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST,created_python_unit_test_by_llm)
+
+def fixing_unit_test_did_not_work():
+    print("Fixing the Unit-Test did not work. Now the line containing the error is removed")
+    prompt = construct_prompt_for_failed_unit_test()
+    prompt += """To fix this unit-test remove only the specific line containing the error."""
+    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
+    measure_code_coverage(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
+
+if __name__ == "__main__":
+    print("Sending prompt to gpt to create Unit-Test:")
+    redesign_prompt_by_llM = False
+
+    
+    try:
+        which_task_index = int(sys.argv[1])
+    except:
+        which_task_index = 2
+    
+
+
+    #create prompt
+    prompt = create_prompt(redesign_prompt_by_llM)
+
+    #send prompt
+    send_prompt(prompt)
+    unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
+
+    #did the unit test compile?
+    if(unit_test_bool):
+       unit_test_was_a_success_first_try()
+       exit()
+
+    #try again
+    instruct_model_to_fix_unit_test()
+    unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
+
+    #did the fixed unit test compile?
+    if(unit_test_bool):
+        print("Fixing the Unit-test was successfull")
+        exit()
+    
+    fixing_unit_test_did_not_work()
+    exit()
+    
