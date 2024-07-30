@@ -1,4 +1,5 @@
+
 The things above are the parts of the description of a programming task.
-Now write me a thourough prompt to write a unit test for this task.
-Be clear and in-depth about the cases which need assertions. 
+List an extensive and thourough list of cases which should be tested in a unit test.
 Let's think step by step.
+

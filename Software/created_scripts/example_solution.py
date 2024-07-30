@@ -1,4 +1,7 @@
-#!function!#
-def contains_negative(numbers):
+#!print!#
+def greet(name):
 #!prefix!#
-    return any(num < 0 for num in numbers)
+    print(f"Hello {name}")
+
+greet("Alice")
+greet("Bob")

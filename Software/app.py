@@ -6,7 +6,10 @@ from utils import *
 
 INIT_PROMPT_FOR_CREATING_A_UNIT_TEST="prompts/init_prompt.txt"
 FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
+PROMPT_GENERATE_BY_LLM = "prompts/redesign_prompt.txt"
 
+ROLE_CODER = read_from_file("roles/coder.txt")
+ROLE_WRITER = read_from_file("roles/writer.txt")
 FILENAME_OF_INIT_CREATED_UNIT_TEST="created_scripts/created_unit_test.py"
 FILENAME_OF_THE_FIXED_INIT_UNIT_TEST="created_scripts/test-script-fixed.py"
 LOGGING_OF_LAST_EXECUTED_UNIT_TEST="logging/testLogging.txt"
@@ -34,6 +37,7 @@ def measure_code_coverage(filename):
         print("couldnt find coverage json results")
 
 def measure_mutation_score(code_filename,test_filename):
+    print(f"{code_filename,test_filename}...")
     subprocess.call(f"mutmut run --paths-to-mutate {code_filename} --tests-dir {test_filename}", shell = True, executable="/bin/sh")
 
 def get_code_complexity(code_filename):
@@ -49,14 +53,12 @@ def get_code_complexity(code_filename):
     except:
         print("couldnt find complexity json results")
 
-def send_prompt_to_model(prompt):
+def send_prompt_to_model(prompt, role_description):
     client = OpenAI(api_key="")
     print("Sending prompt!...")
     chat_completion = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": """You are an outstanding programmer, 
-            but secluded and efficient. As a professional programmer you answer 
-            as concise and precise as possible without any unnecessary words"""},
+            {"role": "system", "content": role_description},
             {
                 "role": "user",
                 "content": prompt,
@@ -78,7 +80,7 @@ def construct_prompt_for_failed_unit_test():
 
     return prompt
     
-def construct_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_descr,incl_filename,incl_func_name,inc_test_examples,incl_code):
+def construct_prompt(init_prompt,index,incl_init_prompt,incl_task_descr,incl_filename,incl_func_name,inc_test_examples,incl_code):
     base_prompt =""
     result = process_folders(FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES)
     filename = "example_solution.py"
@@ -86,9 +88,9 @@ def construct_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_descr,
     print(f"The actual Task is: {subfolder_name}")
     for elem in result[index]:
         if(elem[0] == "taskdescription" and incl_task_descr):
-            base_prompt += f"\n\n#This is the taskdescription:\n{elem[1]}\n\n"
+            base_prompt += f"\n#This is the taskdescription:\n{elem[1]}"
         if(elem[0] == "filename" and incl_filename):
-            filename = str(elem[1])
+            base_prompt += f"\nthe code is located in the file named:'{str(elem[1])}', so think of importing the file\n\n"
         if(elem[0] == "functionname" and incl_func_name):
             base_prompt += f"#This is the functionname:\n{elem[1]}\n\n"
         if(elem[0] == "testexamples" and inc_test_examples):
@@ -100,20 +102,15 @@ def construct_prompt(init_prompt,index,redesign_prompt_with_LLM,incl_task_descr,
         FILENAME_OF_THE_CODE_OF_WHICH_A_TEST_SHOULD_BE_GENERATED=f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
         base_prompt += "\n#This is the written code:\n"
         base_prompt += read_from_file(FILENAME_OF_THE_CODE_OF_WHICH_A_TEST_SHOULD_BE_GENERATED)
-    base_prompt += f"\n\nthe code is located in the file named:{filename}, so think of importing the file\n\n"
     #print(base_prompt)
     #print(filename)
-    if(redesign_prompt_with_LLM):
-        
-        base_prompt += read_from_file("prompts/redesign_prompt.txt")
-    else:
+    if(incl_init_prompt):
         base_prompt += init_prompt
     
     return base_prompt, f"{FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES}{subfolder_name}{filename}"
 
-def create_prompt(redesign_promtp_by_llM):
-    init_prompt = read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
-    prompt,file_location = construct_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=redesign_promtp_by_llM,
+def create_prompt(init_prompt):
+    prompt,file_location = construct_prompt(init_prompt,which_task_index, incl_init_prompt=True,
                                                                             incl_task_descr=True,
                                                                             incl_filename=True,
                                                                             incl_func_name=True,
@@ -121,40 +118,44 @@ def create_prompt(redesign_promtp_by_llM):
                                                                             incl_code=True)
     subprocess.call(f"cp {file_location} created_scripts/example_solution.py", shell = True, executable="/bin/sh")
     prompt += f"\nWrite at least {get_code_complexity("created_scripts/example_solution.py")} Assertions!"
+    return prompt
+
+def create_prompt_by_llm(redesign_promtp_by_llM):
     if(redesign_promtp_by_llM):
-        prompt = send_prompt_to_model(prompt)
-        prompt,file_location = construct_prompt(init_prompt,which_task_index, redesign_prompt_with_LLM=False,
+        prompt,file_location = construct_prompt("",which_task_index, incl_init_prompt=False,
                                                                                 incl_task_descr=True,
                                                                                 incl_filename=True,
                                                                                 incl_func_name=True,
-                                                                                inc_test_examples=False,
-                                                                                incl_code=False)#"""
+                                                                                inc_test_examples=True,
+                                                                                incl_code=True)#"""
     return prompt
 
 def send_prompt(prompt):
-    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
+    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt,ROLE_CODER))
     write_to_file(FILENAME_OF_INIT_CREATED_UNIT_TEST,created_python_unit_test_by_llm)
     
 def unit_test_was_a_success_first_try():
     print("SUCCESS! Unit-test generation was successful\n")
     measure_code_coverage(FILENAME_OF_INIT_CREATED_UNIT_TEST)
-    #measure_mutation_score(FILENAME_OF_INIT_CREATED_UNIT_TEST,"created_scripts/classes_to_test/contains_negative.py")
+    #example solution, 
+    measure_mutation_score("created_scripts/example_solution.py",FILENAME_OF_INIT_CREATED_UNIT_TEST)
         
 def instruct_model_to_fix_unit_test():
     print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test")
-    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test()))
+    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(construct_prompt_for_failed_unit_test(),ROLE_CODER))
     write_to_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST,created_python_unit_test_by_llm)
 
 def fixing_unit_test_did_not_work():
     print("Fixing the Unit-Test did not work. Now the line containing the error is removed")
     prompt = construct_prompt_for_failed_unit_test()
     prompt += """To fix this unit-test remove only the specific line containing the error."""
-    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt))
+    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt,ROLE_CODER))
     measure_code_coverage(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
 
 if __name__ == "__main__":
+
     print("Sending prompt to gpt to create Unit-Test:")
-    redesign_prompt_by_llM = False
+    redesign_prompt_by_llM = True
 
     
     try:
@@ -165,8 +166,15 @@ if __name__ == "__main__":
 
 
     #create prompt
-    prompt = create_prompt(redesign_prompt_by_llM)
-
+    if(redesign_prompt_by_llM):
+        prompt = create_prompt_by_llm(redesign_prompt_by_llM) 
+        prompt += read_from_file(PROMPT_GENERATE_BY_LLM)
+        prompt = send_prompt_to_model(prompt,ROLE_WRITER)
+        prompt = "Write a unit test in python \n"+prompt
+        print(f"created by LLM:{prompt}")
+        
+    else:
+        prompt = create_prompt(redesign_prompt_by_llM,read_from_file(INIT_PROMPT_FOR_CREATING_A_UNIT_TEST))
     #send prompt
     send_prompt(prompt)
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)

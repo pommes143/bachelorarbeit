@@ -7,3 +7,4 @@ pytest
 radon
 numpy
 coverage-threshold
+mutatest

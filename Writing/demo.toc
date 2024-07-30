@@ -18,24 +18,24 @@
 \contentsline {paragraph}{Role description:}{5}{section*.3}%
 \contentsline {section}{\numberline {3.3}Training-data}{5}{section.3.3}%
 \contentsline {section}{\numberline {3.4}Pre-processing}{5}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Post-processing}{5}{section.3.5}%
-\contentsline {section}{\numberline {3.6}Validation}{5}{section.3.6}%
-\contentsline {section}{\numberline {3.7}Strategies for failures}{5}{section.3.7}%
-\contentsline {paragraph}{Lemma}{5}{section*.4}%
-\contentsline {section}{\numberline {3.8}provide overview diagram illustrating my steps}{6}{section.3.8}%
-\contentsline {chapter}{\chapternumberline {4}Implementation}{7}{chapter.4}%
-\contentsline {section}{\numberline {4.1} for each of the steps how it was implemented in the code}{7}{section.4.1}%
-\contentsline {chapter}{\chapternumberline {5}Experiments}{8}{chapter.5}%
-\contentsline {section}{\numberline {5.1}what i want to show}{8}{section.5.1}%
-\contentsline {section}{\numberline {5.2}how i want to show it}{8}{section.5.2}%
-\contentsline {section}{\numberline {5.3}baselines and assumptions}{8}{section.5.3}%
-\contentsline {section}{\numberline {5.4}what was my initial assumption}{8}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Table for experiments}{8}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Discussion of the results}{8}{section.5.6}%
-\contentsline {chapter}{\chapternumberline {6}Conclusion}{9}{chapter.6}%
-\contentsline {section}{\numberline {6.1}re-telling of the paper}{9}{section.6.1}%
-\contentsline {section}{\numberline {6.2}high-level overview of experimental results}{9}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Limitations}{9}{section.6.3}%
-\contentsline {section}{\numberline {6.4}what future work could accomplish}{9}{section.6.4}%
-\contentsline {section}{\numberline {6.5}final words}{9}{section.6.5}%
-\contentsline {chapter}{\chapternumberline {7}latex features}{10}{chapter.7}%
+\contentsline {section}{\numberline {3.5}Post-processing and validation}{5}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Strategies for failures}{5}{section.3.6}%
+\contentsline {section}{\numberline {3.7}provide overview diagram illustrating my steps}{5}{section.3.7}%
+\contentsline {chapter}{\chapternumberline {4}Implementation}{6}{chapter.4}%
+\contentsline {section}{\numberline {4.1} Code examples}{6}{section.4.1}%
+\contentsline {chapter}{\chapternumberline {5}Experiments}{7}{chapter.5}%
+\contentsline {section}{\numberline {5.1}baselines}{7}{section.5.1}%
+\contentsline {section}{\numberline {5.2}what i want to show}{7}{section.5.2}%
+\contentsline {section}{\numberline {5.3}how i want to show it}{7}{section.5.3}%
+\contentsline {section}{\numberline {5.4}baselines and assumptions}{7}{section.5.4}%
+\contentsline {section}{\numberline {5.5}what was my initial assumption}{7}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Table for experiments}{7}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Discussion of the results}{7}{section.5.7}%
+\contentsline {chapter}{\chapternumberline {6}Conclusion}{8}{chapter.6}%
+\contentsline {section}{\numberline {6.1}re-telling of the paper}{8}{section.6.1}%
+\contentsline {section}{\numberline {6.2}high-level overview of experimental results}{8}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Limitations}{8}{section.6.3}%
+\contentsline {section}{\numberline {6.4}what future work could accomplish}{8}{section.6.4}%
+\contentsline {section}{\numberline {6.5}final words}{8}{section.6.5}%
+\contentsline {chapter}{\chapternumberline {7}latex features}{9}{chapter.7}%
+\contentsline {paragraph}{Lemma}{9}{section*.4}%

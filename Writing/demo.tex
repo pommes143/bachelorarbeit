@@ -6,7 +6,7 @@
 \fi
 
 \usepackage[english]{babel}
-
+\usepackage{biblatex}
 % This is the only file needed for actually using the smart-thesis style.
 \input{style}
 
@@ -49,15 +49,15 @@
 \mainmatter
 
 \chapter{Introduction}
-Unit-test are really important and useful. But most often those tests don't get written because of laziness, so the automatic generation of those tests arise as a possible solution.
+Unit-test are really important and useful. But it is a a lot of work to write them, so the automatic generation of those tests arise as a possible solution.
 \\
 Large Language Models (LLMs) offer for the the possibility of creating useful unit-tests. But those generated test are flawed because those LLMs dont work with reason, but instead the statistically most probable answer.
 \\
 Prior work  has tried under different circumstances to solve this problem.[paper 1,2,3].
 \\
-My goal in this work is to:\\
+My goal in this work is to:
 \begin{enumerate}
-%\itemsep-1.5em
+%\itemsep-2.5em
 \item measure the code coverage and statement coverage of generated unit-test
 \item generate these unit-tests with different LLMs
 \item generate these unit-tests with different prompt design strategies
@@ -70,6 +70,7 @@ Unit-tests are tests written for already existing code to make sure the implemen
 Code coverage and statement coverage are two well-known and often used metrics in the context of unit-tests. There are more metrics like the mutation-score but code and statement coverage are the most implemented and available.
 For all metrics concerning unit-test and above it is important to keep in mind that there a no metrics that can be used to guarantee bug-free code. It is more an indication of where more tests might be needed rather than making any statement about the quality and conceptual coverage that the tests provide for the actual code.
 So in the end there are no perfect, singular metrics that can be used to assess the quality and conceptual coverage of unit-tests. Experience and the combined use of several different metrics to arrive at an indication is the best way to create high-quality unit-tests.
+\epigraph{Program testing can be used to show the presence of bugs, but never to show their absence!}{Dijkstra }
 \subsection{code coverage}
 Code coverage is a measure of how much of a program's source code is executed during testing. It works by tracking which lines of code, functions, or branches are run when tests are performed.  
 \subsection{statement coverage}
@@ -161,6 +162,7 @@ If after that the result still doesn't compile, another prompt is send with the 
 
 \chapter{Experiments}
 \section{baselines}
+
 \section{what i want to show}
 \section{how i want to show it}
 \section{baselines and assumptions}
