@@ -25,7 +25,43 @@ def extract_code_from_prompt(returned_string):
         
     if("python" in returned_string.split()[:5]):
         returned_string = returned_string.replace("python","")
-    return returned_string
+    return set_execution_right(returned_string)
+
+
+#remove everything below "if __name__ == '__main__':" and replace with "unittest.main()"
+def set_execution_right(string):
+    lines = string.split('\n')
+    output_lines = []
+    replace_block = False
+    main_indentation = None
+    was_an_if_found = False
+    was_an_unittest_import_found = False
+    for line in lines:
+        if (line.strip().startswith("import unittest")):
+            was_an_unittest_import_found = True
+        if line.strip().startswith("if __name__ == '__main__':"):
+            was_an_if_found = True
+            replace_block = True
+            output_lines.append(line + " # pragma: no cover")
+            main_indentation = len(line) - len(line.lstrip())
+            output_lines.append(' ' * (main_indentation + 4) + "unittest.main()")
+        elif replace_block:
+            if line.strip() == '':
+                output_lines.append(line)
+            elif len(line) - len(line.lstrip()) <= main_indentation:
+                replace_block = False
+                output_lines.append(line)
+        else:
+            output_lines.append(line)
+
+    if(not was_an_if_found):
+        output_lines.append("if __name__ == '__main__': #pragma: no cover")
+        main_indentation = len(line) - len(line.lstrip())
+        output_lines.append(' ' * (main_indentation + 4) + "unittest.main()")
+    if(not was_an_unittest_import_found):
+        print("asssssssssssssss")
+        output_lines.insert(0,"import unittest")
+    return '\n'.join(output_lines)
 
 def process_folders(main_folder):
     result = []

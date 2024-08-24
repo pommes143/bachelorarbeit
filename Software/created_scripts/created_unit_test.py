@@ -1,55 +1,27 @@
 import unittest
+from example_solution import name_check
 
-def greeting(names):
-    hello_str = "Hello "
-    output = ""
-    for name in ["Alice", "Bob"]:
-        output += f"{hello_str}{name}\n"
-    output += f"{hello_str}{names}\n"
-    return output
+class TestNameCheck(unittest.TestCase):
 
-class TestGreeting(unittest.TestCase):
-    def test_single_name(self):
-        self.assertEqual(greeting("Alice"), "Hello Alice\nHello Alice\nHello Bob")
+    def test_name_check_x_present(self):
+        result = name_check("Robert")
+        self.assertEqual(result[0], False)
+        self.assertEqual(result[1], ('o', 'b', 'e', 'r', 't'))
 
-    def test_different_name(self):
-        self.assertEqual(greeting("Bob"), "Hello Bob\nHello Alice\nHello Bob")
+    def test_name_check_x_not_present_uppercaseX(self):
+        result = name_check("Xena")
+        self.assertEqual(result[0], True)
+        self.assertEqual(result[1], ('e', 'n', 'a'))
 
-    def test_empty_name(self):
-        self.assertEqual(greeting(""), "Hello \nHello Alice\nHello Bob")
+    def test_name_check_x_not_present_mixedCase(self):
+        result = name_check("Alex")
+        self.assertEqual(result[0], False)
+        self.assertEqual(result[1], ('l', 'e', 'x'))
 
-    def test_multiple_names(self):
-        self.assertEqual(greeting("Charlie"), "Hello Charlie\nHello Alice\nHello Bob")
+    def test_name_check_x_present_multipleX(self):
+        result = name_check("Maxim")
+        self.assertEqual(result[0], True)
+        self.assertEqual(result[1], ('a', 'x', 'i', 'm'))
 
-    def test_numeric_input(self):
-        self.assertEqual(greeting(123), "Hello 123\nHello Alice\nHello Bob")
-
-    def test_special_characters(self):
-        self.assertEqual(greeting("@#$%"), "Hello @#$%\nHello Alice\nHello Bob")
-
-    def test_indentation_check(self):
-        self.assertEqual(greeting("Alice"),)
-
-    def test_continuity_check(self):
-        self.assertEqual(greeting("Alice"), "Hello Alice\nHello Alice\nHello Bob")
-
-    def test_output_assertion_check(self):
-        self.assertIn("Hello Alice\nHello Bob", greeting("Alice"))
-
-    def test_variable_passing_check(self):
-        self.assertTrue('name' in greeting.__code__.co_varnames)
-
-    def test_duplicate_greeting_check(self):
-        self.assertEqual(greeting("Alice").count("Hello Alice"), 1)
-
-    def test_name_length_limit_check(self):
-        self.assertEqual(greeting("AnExtremelyLongNameThatExceedsTheCharacterLimit"), "Hello AnExtremelyLongNameThatExceedsTheCharacterLimit\nHello Alice\nHello Bob")
-
-    def test_case_sensitivity_check(self):
-        self.assertEqual(greeting("alice"), "Hello alice\nHello Alice\nHello Bob")
-
-    def test_name_with_whitespaces(self):
-        self.assertEqual(greeting("  Alice  "), "Hello   Alice  \nHello Alice\nHello Bob")
-
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     unittest.main()
