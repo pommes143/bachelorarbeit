@@ -412,7 +412,7 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
 
 if __name__ == "__main__":
 
-    model = models.LLAMA7B
+    model = models.GPT35
     
     #execute_sequence_for_chart_for_each_model()
     #print(does_the_unit_test_run_successfully("created_scripts/test-script-fixed.py"))
