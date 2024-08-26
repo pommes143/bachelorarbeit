@@ -1,27 +1,16 @@
 import unittest
-from example_solution import name_check
+from example_solution import contains_negative
 
-class TestNameCheck(unittest.TestCase):
+class TestContainsNegative(unittest.TestCase):
 
-    def test_name_check_x_present(self):
-        result = name_check("Robert")
-        self.assertEqual(result[0], False)
-        self.assertEqual(result[1], ('o', 'b', 'e', 'r', 't'))
+    def test_no_negative_numbers(self):
+        self.assertFalse(contains_negative([1, 2, 3, 4, 5]))
 
-    def test_name_check_x_not_present_uppercaseX(self):
-        result = name_check("Xena")
-        self.assertEqual(result[0], True)
-        self.assertEqual(result[1], ('e', 'n', 'a'))
+    def test_negative_number_present(self):
+        self.assertTrue(contains_negative([1, 2, -3, 4, 5]))
 
-    def test_name_check_x_not_present_mixedCase(self):
-        result = name_check("Alex")
-        self.assertEqual(result[0], False)
-        self.assertEqual(result[1], ('l', 'e', 'x'))
-
-    def test_name_check_x_present_multipleX(self):
-        result = name_check("Maxim")
-        self.assertEqual(result[0], True)
-        self.assertEqual(result[1], ('a', 'x', 'i', 'm'))
+    def test_all_negative_numbers(self):
+        self.assertTrue(contains_negative([-1, -2, -3, -4, -5]))
 
 if __name__ == '__main__': # pragma: no cover
     unittest.main()

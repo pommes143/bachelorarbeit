@@ -1,8 +1,4 @@
 #!function!#
-def name_check(my_name):
+def contains_negative(numbers):
 #!prefix!#
-    lowercase_name = my_name.lower()
-    my_name_tuple = tuple(lowercase_name)
-    a = "x" in my_name_tuple
-    b = my_name_tuple[1:] 
-    return a,b
+    return any(num < 0 for num in numbers)

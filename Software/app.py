@@ -2,6 +2,8 @@ from openai import OpenAI
 import subprocess, sys
 import json
 from utils import *
+import aiohttp
+import asyncio
 
 
 #task used for prompt homing: 0,2,7
@@ -32,7 +34,7 @@ def run_test_suite(code_filename,test_filename):
     code_cov = 0
     branch_cov = 0
     print("Measuring code coverage\n" if PRINT_VERBOSE else "",end='')    
-    subprocess.call(f"coverage run --branch {test_filename} ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage run --branch {test_filename} &> /dev/null", shell = True, executable="/bin/sh")
     subprocess.call(f"coverage json &> /dev/null", shell = True, executable="/bin/sh")
     subprocess.call(f"coverage report &> logging/code_cov.txt ", shell = True, executable="/bin/sh")
     
@@ -91,6 +93,24 @@ def send_prompt_to_model(prompt, role_description):
     )
     print(f"...Received result from chat-gpt\n" if PRINT_VERBOSE else "",end='')
     return chat_completion.choices[0].message.content
+
+async def generate_language_ollama(instruction, model, role, max_tokens=300): 
+    ollama_url = "https://6ee06hx5eq70ok-11434.proxy.runpod.net/" 
+    async with aiohttp.ClientSession() as session: 
+        payload = { 
+        "model": model, 
+        "prompt": instruction, 
+        "stream": False, 
+        "options": {"num_predict": max_tokens},
+        } 
+
+        if not role is None: 
+            payload["system"] = role 
+            async with session.post(f"{ollama_url}api/generate", json=payload) as response: 
+                text = await response.text() 
+                text = json.loads(text)["response"] 
+
+    return(text)
 
 def assemble_query_prompt_to_fix_failing_unit_test():
     prompt= read_from_file(FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT)
@@ -366,10 +386,13 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
     return [code_cov, branch_cov, mutmut_score,did_first_code_generation_fail, does_the_code_work_in_the_end]
 
 if __name__ == "__main__":
+    text = asyncio.run(generate_language_ollama("what is america", "llama3.1","you are a historian"))
+    print(text)
+    exit()
     #execute_sequence_for_chart_for_each_model()
     #print(does_the_unit_test_run_successfully("created_scripts/test-script-fixed.py"))
     revise_instruction_prompt_by_llm = False
-    PRINT_VERBOSE = True
+    PRINT_VERBOSE = False
     try:
         which_task_index = int(sys.argv[1])
     except:
@@ -380,6 +403,7 @@ if __name__ == "__main__":
                                     inc_test_examples=True,
                                     incl_code=True,
                                     prompt_for_init_generation=INIT_PROMPT_FOR_CREATING_A_UNIT_TEST)
+    print(list_of_metrics)
     exit()
     
     

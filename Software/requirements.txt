@@ -8,3 +8,5 @@ radon
 numpy
 coverage-threshold
 mutatest
+aiohttp
+async
