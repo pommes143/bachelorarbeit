@@ -13,23 +13,43 @@ def print_from_file(filename):
         print(file.read())
 
 def extract_code_from_prompt(returned_string):
+    blocks = returned_string.split('```')
+    
+    # Check each block for the specific string
+    for block in blocks:
+        if "if __name__ ==" in block:
+            if block.startswith('python'):
+                block = block[6:].strip()
+                print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
+            return set_syntax_and_imports_right_and_add_pragma(block)
+        
+    return set_syntax_and_imports_right_and_add_pragma(blocks[0])
+
     start = '```'
     end = '```'
-    if((start in returned_string) and (end in returned_string)):
-        s = returned_string
-        s = s[s.find(start)+len(start):s.rfind(end)]
-        returned_string = s[s.index('\n')+1:]
-
-    if((start in returned_string) or (end in returned_string)):
-        returned_string = returned_string.replace(start,"").replace(end,"")
-        
-    if("python" in returned_string.split()[:5]):
-        returned_string = returned_string.replace("python","")
-    return set_execution_right(returned_string)
+    code_blocks = []
+    
+    # Find all code blocks
+    start_indices = [i for i in range(len(returned_string)) if returned_string.startswith(start, i)]
+    end_indices = [i for i in range(len(returned_string)) if returned_string.startswith(end, i)]
+    if len(start_indices) != len(end_indices):
+        return None  # Mismatched code block delimiters
+    
+    # Extract code blocks
+    for s, e in zip(start_indices, end_indices):
+        block = returned_string[s+len(start):e].strip()
+        if block.startswith('python'):
+            block = block[6:].strip()  # Remove 'python' from the start
+        code_blocks.append(block)
+    
+    # Find the block with "if __name__ == '__main__':"
+    main_block = next((block for block in code_blocks if "if __name__ == '__main__':" in block), None)
+    
+    return (main_block)
 
 
 #remove everything below "if __name__ == '__main__':" and replace with "unittest.main()"
-def set_execution_right(string):
+def set_syntax_and_imports_right_and_add_pragma(string):
     lines = string.split('\n')
     output_lines = []
     replace_block = False
@@ -59,7 +79,6 @@ def set_execution_right(string):
         main_indentation = len(line) - len(line.lstrip())
         output_lines.append(' ' * (main_indentation + 4) + "unittest.main()")
     if(not was_an_unittest_import_found):
-        print("asssssssssssssss")
         output_lines.insert(0,"import unittest")
     return '\n'.join(output_lines)
 

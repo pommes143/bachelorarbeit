@@ -1,6 +1,6 @@
 openai
 unittest2
-coverage
+coverage==7.6.1
 mutmut
 importlib
 pytest
@@ -10,3 +10,4 @@ coverage-threshold
 mutatest
 aiohttp
 async
+
