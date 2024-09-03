@@ -1,7 +1,12 @@
 import os
+import pickle
 
 def write_to_file(filename, string_to_be_written):
     with open(filename, 'w') as file:
+        file.write(string_to_be_written)
+
+def append_to_file(filename, string_to_be_written):
+    with open(filename, 'a') as file:
         file.write(string_to_be_written)
 
 def read_from_file(filename):
@@ -12,6 +17,15 @@ def print_from_file(filename):
     with open(filename, 'r') as file:
         print(file.read())
 
+#files with .pik ending are pickled data
+def pickle_in(filename,content):
+    with open(filename, 'wb') as file:
+        pickle.dump(content,file)
+
+def pickle_out(filename):
+    with open(filename, 'rb') as file:
+        return pickle.load(file)
+
 def extract_code_from_prompt(returned_string):
     blocks = returned_string.split('```')
     
@@ -20,11 +34,23 @@ def extract_code_from_prompt(returned_string):
         if "if __name__ ==" in block:
             if block.startswith('python'):
                 block = block[6:].strip()
-                print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
+                #print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
             return set_syntax_and_imports_right_and_add_pragma(block)
         
     return set_syntax_and_imports_right_and_add_pragma(blocks[0])
 
+    for block in blocks:
+        if block.startswith('python'):
+            block = block[6:].strip()
+            if("if __name__ ==" in block):
+                    #print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
+                return set_syntax_and_imports_right_and_add_pragma(block)
+            else:
+                block += ("if __name__ == '__main__':\n")
+                return set_syntax_and_imports_right_and_add_pragma(block)
+    
+        
+    return set_syntax_and_imports_right_and_add_pragma(blocks[0])
     start = '```'
     end = '```'
     code_blocks = []

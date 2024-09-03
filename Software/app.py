@@ -5,6 +5,7 @@ from utils import *
 import aiohttp
 import asyncio
 from enum import Enum
+import numpy as np
 
 
 #task used for prompt homing: 0,2,7
@@ -13,6 +14,8 @@ INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST=read_from_file("prompts/naive_init_pr
 FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
 PROMPT_GENERATE_BY_LLM = "prompts/redesign_prompt.txt"
 
+
+LIST_OF_TASKS_USED_FOR_VALIDATION=[0,2,4,7,8,16] 
 PRINT_VERBOSE = True
 ROLE_CODER = read_from_file("roles/coder.txt")
 ROLE_WRITER = read_from_file("roles/writer.txt")
@@ -20,13 +23,12 @@ FILENAME_OF_INIT_CREATED_UNIT_TEST="created_scripts/created_unit_test.py"
 FILENAME_OF_THE_FIXED_INIT_UNIT_TEST="created_scripts/fixed_created_unit_test.py"
 FILENAME_OF_THE_DELETED_LINE_UNIT_TEST="created_scripts/deleted_line_unit_test.py"
 LOGGING_OF_LAST_EXECUTED_UNIT_TEST="logging/logging_of_last_failure.txt"
-LOGGING_OF_LAST_COLLECTED_METRICS="logging_of_last_metrics.txt"
 FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES="/home/rpommes/1Zentrum/Uni/24SoSe/Bachelorarbeit/Intro_to_Python/task_folder/"
 
 class models(Enum):
     GPT35 = "gpt-3.5-turbo"
     GPT4 = "gpt-4o"
-    LLAMA7B = "llama3.1" 
+    LLAMA8B = "llama3.1" 
 
 def does_the_unit_test_run_successfully(filename):
     val =subprocess.call(f"./execute_test.sh {filename} &> {LOGGING_OF_LAST_EXECUTED_UNIT_TEST}", shell = True, executable="/bin/sh")
@@ -36,41 +38,40 @@ def does_the_unit_test_run_successfully(filename):
         return False
     
 def run_test_suite(code_filename,test_filename):
-    #Code coverage
+    #verage
     code_cov = 0
     branch_cov = 0
-    print("Measuring code coverage\n" if PRINT_VERBOSE else "",end='')    
     subprocess.call(f"coverage run --branch {test_filename} &> /dev/null", shell = True, executable="/bin/sh")
     subprocess.call(f"coverage json &> /dev/null", shell = True, executable="/bin/sh")
     #subprocess.call(f"coverage html ", shell = True, executable="/bin/sh")
+    subprocess.call(f"coverage report &> logging/code_cov.txt ", shell = True, executable="/bin/sh")
     
-    if(PRINT_VERBOSE):
-        subprocess.call(f"coverage report &> logging/code_cov.txt ", shell = True, executable="/bin/sh")
-        subprocess.call(f"coverage report ", shell = True, executable="/bin/sh")
-    else:
         
-        subprocess.call(f"coverage report &> logging/code_cov.txt ", shell = True, executable="/bin/sh")
-    
-    code_cov = next(int(word.rstrip('%')) for line in read_from_file("logging/code_cov.txt").splitlines() if code_filename in line for word in reversed(line.split()) if word.endswith('%'))/100
-    
     with open("coverage.json") as f:
         d = json.load(f)
-        #code_cov = d["totals"]["percent_covered"]
+        try:
+            code_cov = next(int(word.rstrip('%')) for line in read_from_file("logging/code_cov.txt").splitlines() if code_filename in line for word in reversed(line.split()) if word.endswith('%'))/100
+        except:
+            code_cov = d["totals"]["percent_covered"]
         if(d["totals"]["num_branches"] == 0):
             branch_cov = 1.0
         else:
             branch_cov = d["totals"]["covered_branches"]/d["totals"]["num_branches"]
-        print(f"code coverage: {code_cov}\n" if PRINT_VERBOSE else "",end='')
+        print(f"\ncode coverage: {code_cov}\n" if PRINT_VERBOSE else "",end='')
         print(f"branch coverage: {branch_cov}\n" if PRINT_VERBOSE else "",end='')
 
 
 
     subprocess.call(f"coverage erase", shell = True, executable="/bin/sh")
     #Mutation score
-    subprocess.call(f"mutmut run --paths-to-mutate {code_filename} --tests-dir {test_filename} --simple-output &> {"logging/mutmut_score.txt"}", shell = True, executable="/bin/sh")
+    subprocess.call(f"mutmut run --paths-to-mutate {code_filename} --tests-dir {test_filename} --simple-output &> logging/mutmut_score.txt", shell = True, executable="/bin/sh")
     mutmut_score = (read_from_file("logging/mutmut_score.txt").strip().split('\n')[-1].split()[1].split('/'))
-    print(f"mutmut score: {mutmut_score}\n" if PRINT_VERBOSE else "",end='')
+    
     mutmut_score = int(mutmut_score[0])/int(mutmut_score[1])
+    if(code_cov >1.0):
+        code_cov = code_cov/100
+    print(f"mutmut score: {mutmut_score}\n" if PRINT_VERBOSE else "",end='')
+    print(f"{"#"*80}\n" if PRINT_VERBOSE else "",end='')
     return code_cov, branch_cov, mutmut_score
 
 def get_code_complexity(code_filename):
@@ -80,8 +81,7 @@ def get_code_complexity(code_filename):
             d = json.load(f)
             #convert metric "A","B"..."D" into ascii ,then number,then times two
             number_of_min_asserts = 2*(ord(d[f"{code_filename}"][0]["rank"])-63)
-            print (f"{number_of_min_asserts}\n" if PRINT_VERBOSE else "",end='')
-            print(f"the complexity rank is: {d[f"{code_filename}"][0]["rank"]}\n" if PRINT_VERBOSE else "",end='')
+            print(f"the complexity rank of the code is: {d[f"{code_filename}"][0]["rank"]}\n" if PRINT_VERBOSE else "",end='')
             return number_of_min_asserts-1
     except:
         print("couldnt find complexity json results")
@@ -111,7 +111,8 @@ def generate_languag_gpt(prompt, role_description, model):
     return chat_completion.choices[0].message.content
 
 async def generate_language_ollama(prompt, role_description, model): 
-    ollama_url = "https://6ee06hx5eq70ok-11434.proxy.runpod.net/" 
+    ollama_url = "https://ny4c9zz4bzfbey-11434.proxy.runpod.net/" 
+    print(f"{"#"*120}\nprompt:\n{prompt}\n{"#"*120}")
     print(f"Sending prompt!...\n" if PRINT_VERBOSE else "",end='')
     async with aiohttp.ClientSession() as session: 
         payload = { 
@@ -127,7 +128,7 @@ async def generate_language_ollama(prompt, role_description, model):
                 text = await response.text() 
                 text = json.loads(text)["response"] 
     print(f"...Received result from ollama\n" if PRINT_VERBOSE else "",end='')
-
+    print(f"{"#"*120}\nreturn:\n{text}\n{"#"*120}")
     return(text)
 
 def assemble_query_prompt_to_fix_failing_unit_test():
@@ -158,7 +159,7 @@ def assemble_init_query_prompt(textual_instruction_prompt,index,incl_task_descr,
     task = process_folders(FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES)
     filename = "example_solution.py"
     subfolder_name = str(task[index][0])+"/"
-    print(f"The actual Task is: {subfolder_name}\n" if PRINT_VERBOSE else "",end='')
+    print(f"\n\n{"#"*80}\nThe actual Task is: {subfolder_name}\n" if PRINT_VERBOSE else "",end='')
 
     #Assembling
     for elem in task[index]:
@@ -189,8 +190,8 @@ def assemble_llm_generated_query_prompt(textual_instruction_prompt,index,incl_ta
     task = process_folders(FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES)
     filename = "example_solution.py"
     subfolder_name = str(task[index][0])+"/"
-    print(f"The actual Task is: {subfolder_name}\n" if PRINT_VERBOSE else "",end='')
-
+    print(f"\n\n{"#"*80}\nThe actual Task is: {subfolder_name}\n" if PRINT_VERBOSE else "",end='')
+    print(f"Refining Prompt by LLM!\n" if PRINT_VERBOSE else "",end='')
 
 
     for elem in task[index]:
@@ -252,107 +253,106 @@ def fixing_unit_test_did_not_work(model):
     
 
 #exlude other tasks
-def execute_sequence_for_chart_for_each_model(model):
-    """
-    first for 2 openAI models
-    Write results in file
-    Model:
-        Prompt:
-            prompt_parts:
-                stmnt cov
-                branch cov
-                mut cov
-    
-    1.Load prompt
-    2.select parts
-    3.create results
-    3.5 write to data
-    4.write data to file 
-    """
+def execute_sequence_for_chart(model):
+    results = {}
     #Exluding tasks used for training
-    for which_task_index in range(0,22):
-        print(f"\n\nExamination of task {which_task_index}")
-        """
-        each task, 4 repetitions, 3 prompts, 4 prompt parts
-        at the end, add each result up for each task
-        function(prompt, prompt_parts)->stmnt cov, branch cov, mut error, error in generation
-        """
-        results = {}
-        for prompt in ["naive_prompt","refined_prompt","generated_prompt"]:
-            sub_results = {}
-            print(f"    testing {prompt}")
-            if(prompt == "naive_prompt"):
-                prompt_for_init_generation = INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST
-                revise_instruction_prompt_by_llm = False
-                results["naive_prompt"]=sub_results
-            if(prompt == "refined_prompt"):
-                prompt_for_init_generation = INIT_PROMPT_FOR_CREATING_A_UNIT_TEST
-                revise_instruction_prompt_by_llm = False
-                results["refined_prompt"]=sub_results
-            else:
-                prompt_for_init_generation = INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST
-                revise_instruction_prompt_by_llm = True
-                results["generated_prompt"]=sub_results
-            
-            
-            for repetition in range(4):
-                print("")
-                incl_task_descr = True
-                inc_test_examples = False
-                incl_code = False
-                list_of_metrics = execute_sequence_for_single_run(which_task_index,
-                                                revise_instruction_prompt_by_llm,
-                                                incl_task_descr,
-                                                inc_test_examples,
-                                                incl_code, 
-                                                prompt_for_init_generation,
-                                                model=model)
-                sub_results["only_task_description"]=list_of_metrics
-                print(f"        results for only task descr:\n        {list_of_metrics}")
-            for repetition in range(4):
-                print("")
-                incl_task_descr = True
-                inc_test_examples = True
-                incl_code = False
-                list_of_metrics = execute_sequence_for_single_run(which_task_index,
-                                                revise_instruction_prompt_by_llm,
-                                                incl_task_descr,
-                                                inc_test_examples,
-                                                incl_code, 
-                                                prompt_for_init_generation,
-                                                model=model)
-                sub_results["few_shot_without_code"]=list_of_metrics
-                print(f"        results for few shot without code:\n        {list_of_metrics}")
-            for repetition in range(4):
-                print("")
-                incl_task_descr = True
-                inc_test_examples = False
-                incl_code = True
-                list_of_metrics = execute_sequence_for_single_run(which_task_index,
-                                                revise_instruction_prompt_by_llm,
-                                                incl_task_descr,
-                                                inc_test_examples,
-                                                incl_code,
-                                                prompt_for_init_generation,
-                                                model=model)
-                sub_results["zero_shot_with_code"]=list_of_metrics
-                print(f"        results for zero shot with code:\n        {list_of_metrics}")
-            for repetition in range(4):
-                print("")
-                incl_task_descr = True
-                inc_test_examples = True
-                incl_code = True
-                list_of_metrics = execute_sequence_for_single_run(which_task_index,
-                                                revise_instruction_prompt_by_llm,
-                                                incl_task_descr,
-                                                inc_test_examples,
-                                                incl_code,
-                                                prompt_for_init_generation,
-                                                model=model)
-                sub_results["few_shot_with_code"]=list_of_metrics
-                print(f"        results for few shot with code:\n        {list_of_metrics}")
-            print(results)
+    list_of_indices = list(range(0,22))
+    list_of_indices = [e for e in list_of_indices if e not in LIST_OF_TASKS_USED_FOR_VALIDATION]
+    #list_of_indices = [19,20,21]
+    pickle_in("logging/pickles/table_list.pik",{})
+    print(f"List of tasks that get tested: {list_of_indices}")
+    n_of_iterations = 4
+    for which_task_index in list_of_indices:
+        print(f"Examination of task {which_task_index}")
+        task_dict={}
+        results[str(which_task_index)]=task_dict
 
+        for elem in ["naive_prompt","refined_prompt","generated_prompt"]:
+            prompt_dict = {}
+            task_dict[str(elem)]=prompt_dict
+            if(elem == "naive_prompt"):
+                prompt = INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST
+                revise_instruction_prompt_by_llm = False
+            if(elem == "refined_prompt"):
+                prompt = INIT_PROMPT_FOR_CREATING_A_UNIT_TEST
+                revise_instruction_prompt_by_llm = False
+            if(elem == "generated_prompt"):
+                prompt = INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST
+                revise_instruction_prompt_by_llm = True            
+            print(f"\nPrompt: '{elem}'")
+            print("-Testing description only")
+            list_description_only = repetition_for_sequence( which_task_index,
+                                                            revise_instruction_prompt_by_llm,
+                                                            incl_task_descr=True,
+                                                            inc_test_examples=False,
+                                                            incl_code=False,
+                                                            prompt=prompt,
+                                                            model=model,
+                                                            n_of_iterations=n_of_iterations)
+            prompt_dict["list_description_only"]=list_description_only
+
+            print("-Testing few shot without code")
+            list_few_shot_without_code = repetition_for_sequence( which_task_index,
+                                                            revise_instruction_prompt_by_llm,
+                                                            incl_task_descr=True,
+                                                            inc_test_examples=True,
+                                                            incl_code=False,
+                                                            prompt=prompt,
+                                                            model=model,
+                                                            n_of_iterations=n_of_iterations)
+            prompt_dict["list_few_shot_without_code"]=list_few_shot_without_code
+
+            print("-Testing zero shot with code")
+            list_zero_shot_with_code = repetition_for_sequence( which_task_index,
+                                                            revise_instruction_prompt_by_llm,
+                                                            incl_task_descr=True,
+                                                            inc_test_examples=False,
+                                                            incl_code=True,
+                                                            prompt=prompt,
+                                                            model=model,
+                                                            n_of_iterations=n_of_iterations)
+            prompt_dict["list_zero_shot_with_code"]=list_zero_shot_with_code
+
+            print("-Testing few shot with code")
+            list_few_shot_with_code = repetition_for_sequence( which_task_index,
+                                                            revise_instruction_prompt_by_llm,
+                                                            incl_task_descr=True,
+                                                            inc_test_examples=True,
+                                                            incl_code=True,
+                                                            prompt=prompt,
+                                                            model=model,
+                                                            n_of_iterations=n_of_iterations)
+            prompt_dict["list_few_shot_with_code"]=list_few_shot_with_code
+        print(results)
+        tmp_results = pickle_out("logging/pickles/table_list.pik")
+        tmp_results[str(which_task_index)]=task_dict
+        pickle_in("logging/pickles/table_list.pik",tmp_results)
+        print("Pickled data!")
+    
+
+def repetition_for_sequence(which_task_index,revise_instruction_prompt_by_llm,incl_task_descr,inc_test_examples,incl_code,prompt,model,n_of_iterations):
+    tmp_list = []
+    i = n_of_iterations
+    n_of_failed_attempts = 0
+    while i > 0:
+        list_of_metrics = execute_sequence_for_single_run(which_task_index,
+                                        revise_instruction_prompt_by_llm,
+                                        incl_task_descr=incl_task_descr,
+                                        inc_test_examples=inc_test_examples,
+                                        incl_code=incl_code, 
+                                        prompt_for_init_generation=prompt,
+                                        model=model)
+        #dont count if code doesn't work
+        if(list_of_metrics[4] == False):
+            n_of_failed_attempts += 1
+            print("    -Failed Attempt, not counting and retrying")
+            continue
+        i -= 1
+        print("    -Successful Attempt!")
+        tmp_list.append(list_of_metrics)
+    list_of_averages = (np.mean(tmp_list, axis=0)).tolist()
+    list_of_averages.append(n_of_failed_attempts)
+    return list_of_averages
 
 def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_by_llm,incl_task_descr,inc_test_examples,incl_code, prompt_for_init_generation,model):
     did_first_code_generation_fail = False
@@ -384,6 +384,7 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
     #did the unit test compile?
     if(unit_test_bool):
         #Unit test was a success first try
+        print("SUCCESS! Unit-test generation was a success first try\n" if PRINT_VERBOSE else "",end='')
         code_cov, branch_cov, mutmut_score = run_test_suite("created_scripts/example_solution.py",FILENAME_OF_INIT_CREATED_UNIT_TEST)
     else:
 
@@ -411,17 +412,25 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
     return [code_cov, branch_cov, mutmut_score,did_first_code_generation_fail, does_the_code_work_in_the_end]
 
 if __name__ == "__main__":
-
-    model = models.GPT35
+    revise_instruction_prompt_by_llm = True
     
-    #execute_sequence_for_chart_for_each_model()
-    #print(does_the_unit_test_run_successfully("created_scripts/test-script-fixed.py"))
-    revise_instruction_prompt_by_llm = False
-    PRINT_VERBOSE = True
     try:
         which_task_index = int(sys.argv[1])
     except:
         which_task_index = 2
+    model = models.GPT35
+    PRINT_VERBOSE = True
+    list_of_metrics =execute_sequence_for_single_run(which_task_index=which_task_index,
+                                    revise_instruction_prompt_by_llm=revise_instruction_prompt_by_llm,
+                                    incl_task_descr=True,
+                                    inc_test_examples=True,
+                                    incl_code=True,
+                                    prompt_for_init_generation=INIT_PROMPT_FOR_CREATING_A_UNIT_TEST,
+                                    model=model.value)
+    
+    exit()
+    #print(does_the_unit_test_run_successfully("created_scripts/test-script-fixed.py"))
+    
     list_of_metrics =execute_sequence_for_single_run(which_task_index=which_task_index,
                                     revise_instruction_prompt_by_llm=revise_instruction_prompt_by_llm,
                                     incl_task_descr=True,
