@@ -3,10 +3,11 @@
 \ifpdf
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{graphicx,wrapfig}
 \fi
 
 \usepackage[english]{babel}
-\usepackage{biblatex}
+%\usepackage{biblatex}
 % This is the only file needed for actually using the smart-thesis style.
 \input{style}
 
@@ -25,6 +26,8 @@
 % Loads bibliography for citations.
 \addbibresource{demo-bibliography.bib}
 
+
+
 % Starts creation of a glossary.
 \makeglossaries
 \input{demo-glossary}
@@ -32,13 +35,14 @@
 % Define all the metadata to be listed in \smarttitle and \smartcopyright
 \thesistype{Beachelor Thesis}
 \discipline{Kognitive Informatik}
-\title{Systematic Generation of Unit-Tests with different LLMs and prompt-design}
+\title{Systematic Generation of Unit-Tests with different LLMs and prompt designs}
 \author{Richard Pamies}
 \institution{University of Bielefeld}
-\supervisors{Prof.\@~Dr.-Ing.\@~Benjamin Paaßen,M.Sc.\@~Jesper Dannat}
+\supervisors{Prof.\@~Dr.\@~Benjamin Paaßen,M.Sc.\@~Jesper Dannath}
 
 \begin{document}
-
+%trying that out because debug said so
+\microtypecontext{spacing=nonfrench}
 \frontmatter
 
 \smarttitle
@@ -49,138 +53,401 @@
 \mainmatter
 
 \chapter{Introduction}
-Unit-test are really important and useful. But it is a a lot of work to write them, so the automatic generation of those tests arise as a possible solution.
+\label{Introduction}
+Unit-test are an important tool to ensure code functionality. But it is a a lot of work to write them, so the automatic generation of those tests arise as a possible solution.
 \\
 Large Language Models (LLMs) offer for the the possibility of creating useful unit-tests. But those generated test are flawed because those LLMs dont work with reason, but instead the statistically most probable answer.
 \\
 Prior work  has tried under different circumstances to solve this problem.[paper 1,2,3].
 \\
 My goal in this work is to:
-\begin{enumerate}
-%\itemsep-2.5em
-\item measure the code coverage and statement coverage of generated unit-test
-\item generate these unit-tests with different LLMs
-\item generate these unit-tests with different prompt design strategies
-\end{enumerate}
+\begin{center}
+    \item generate these unit-tests with different LLMs
+    \item generate these unit-tests with different prompt design strategies
+    \item measure the code coverage and statement coverage of generated unit-test
+\end{center}
 and then at the end i want to compare the different approaches.
 
-\chapter{Background and related work}
-\section{Unit-tests}
-Unit-tests are tests written for already existing code to make sure the implemented functionalities still work after further progress on the code is done. The usefulness of unit-tests is not controversial. Rather the time it takes to write them and the metrics used to test their usefulness. 
-Code coverage and statement coverage are two well-known and often used metrics in the context of unit-tests. There are more metrics like the mutation-score but code and statement coverage are the most implemented and available.
-For all metrics concerning unit-test and above it is important to keep in mind that there a no metrics that can be used to guarantee bug-free code. It is more an indication of where more tests might be needed rather than making any statement about the quality and conceptual coverage that the tests provide for the actual code.
-So in the end there are no perfect, singular metrics that can be used to assess the quality and conceptual coverage of unit-tests. Experience and the combined use of several different metrics to arrive at an indication is the best way to create high-quality unit-tests.
-\epigraph{Program testing can be used to show the presence of bugs, but never to show their absence!}{Dijkstra }
-\subsection{code coverage}
-Code coverage is a measure of how much of a program's source code is executed during testing. It works by tracking which lines of code, functions, or branches are run when tests are performed.  
-\subsection{statement coverage}
-Statement coverage on the other hand measures the percentage of executable statements in a program that are executed during testing. However, it has limitations as it doesn't account for different paths through decision points
-\subsection{mutation coverage}
-Mutation score is a measure of test effectiveness that assesses how well tests detect intentional code changes made by mutations. It works by automatically introducing small alterations to the source code, such as changing operators or variable values, and then running the test. The score is the percentage of mutations detected by failing tests. Mutation score is important because it evaluates the quality and sensitivity of tests, revealing weaknesses in test cases that other metrics might miss. A high mutation score suggests that tests are good at catching potential bugs. However, generating and testing mutations can be computationally expensive.
-\subsection{cyclomatic code complexity}
-Cyclomatic complexity is a software metric that measures the number of linearly independent paths through a program's source code. It works by analyzing the control flow graph of a program, counting decision points like if statements and loops. A higher cyclomatic complexity indicates more complex code. This metric is important because it helps identify overly complicated functions or methods that may be difficult to test, maintain, or understand. 
+
+\chapter{Background}
+\label{Background}
+In this chapter i will describe the theoretical basis and key-words of my work to later structurally, highlight the adjacent academic work. The implementation of these concepts, and which libraries and frameworks i selected in my work are elaborated below in "Methods"\ref{Methods}.
 \section{LLMs}
-Large Language Models(LLMs) are computational models that normaly used an enormous data set for learning and are able to achieve general-purpose language generation and other tasks like categorization and other multi-modal tasks. An LLM is only as good as its architecture and its training data. 
+Large Language Models(LLMs) are computational models that normally used an enormous data set for learning and are able to achieve general-purpose language generation and other tasks like categorization and other multi-modal tasks. An LLM is only as good as its architecture and its training data. 
 In the case of unit-tests
 Generating unit-tests for mainstream code might be sufficient. But it is really easy to write code which covers niche subjects. And in those cases the LLM would need critical thinking, understanding and reasoning to fully understand the code and write useful and encompassing unit-tests.
 \subsection{GPT}
-ChatGPT is an advanced conversational AI model developed by OpenAI. It works by using a large language model trained on diverse internet text to generate human-like responses to user inputs. ChatGPT can engage in dialogue, answer questions, and assist with various tasks across multiple domains.
-\subsection{Open source models}
-\section{related work}
+ChatGPT is an advanced conversational AI model developed by OpenAI. It works by using a large language model trained on diverse internet text to generate human-like responses to user inputs. The architectual structure of the model is based on transformers which assign varying weights to input data based on the context.
 
-\chapter{Methods}
-This 
-high level description
-what it should accomplish
-detailed description for reproduction for experienced user
-use illustrating diagrams as much as possible
-(no source code, but perhaps pseudo code)
-provide a good reason for each design choice(source or math)
-use a running example to illustrate the steps
-\section{LLMs}
-I used chat-gpt(GPT) 3.5, GPT 4o, OPEN_SOURCE and OPEN_SOURCE. 
-I used GPT because of its accessibility and prominence and to expand my range i also included the open source models
-For all of these i used an API endpoint to send my prompts to and in the case of the open source models i used my own desktop PC for running the models and hosting the API endpoint.
-These LLMs are the core component that return generated code through prompts and are each more or less capable in the different capabilities necessary to generate unit-tests. 
-\section{Prompt-design}
-A strong leverage to control the resulting output quality of LLMs is prompt-design. Prompt-design describes the mostly iterative, model-specific and experience driven design process of how the textual input prompt is worded and structured to achieve the optimal result.
-In my experiments i validated my prompts with an example exercise and GPT 3.5. 
-My prompt, that was send in the end to the model, consisted of four parts that were togglable:
+In this work i made use of the version 3.5 and 4o.
+\subsection{llama 3.1}
+Llama is LLM which weights are freely available under a licence that permits some amount of commercial use. It was developed by Meta(formally Facebook).
+
+
+\section{Prompt-engineering}
+Prompt engineering describes the systematic design and optimization of input prompts to achieve the best possible result in the use of chatbots like chat-GPT, BARD or Claude. Prompt engineering is a major lever towards better results \cite{Citation needed} and can also be used to overcome challenges like hallucinations \cite{sato2024reducingHallucination}.
+
+It has also been shown that the fine-tuning of prompts is a easy technique that matches the strong performance of model tuning \cite{lester2021promptsAreEfficient}.
+Through the evolution of that discipline alongside chatbots, new techniques have appeared. From simple approaches like being clear and precise and using the phrase "let's think step by step" over few-shot prompting to different versions of chain-of-thought prompting methods\cite{chen2024promptengineering}. 
+
+\subsection{Role-prompting}
+Role-prompting is a prompt which instructs the role and tasks of the LLM on a broader and is not a query. Role-prompting has been shown to have a meaningful impact in the optimization of prompts \cite{kong2024promptRoleplayEffective}.
+
+
+\section{Unit-tests}
+Unit-tests are software tests written to guarantee that the implemented functionalities of functions or other units of code. Unit testing is an important factor in software development. But creating those unit tests by hand is a elaborate and time-consuming task\cite{Daka_unit_tests} \cite{UnitTestAdequacy}. So with the rise of popular LLMs like Open AIs GPT-3 \cite{brown2020languagemodelsfewshotlearners}, Googles BARD and Anthropic’s Claude2, the automatic generation of those software tests arise as a possible optimization to the bounded, regular generation of unit-tests that use static or dynamic analysis techniques to optimize the statement coverage\cite{OverviewUnitTestGeneration2013}. 
+
+\section{Metrics for evaluating unit-tests}
+\label{metricsForEvaluationOfUnitTest}
+Metrics are the techniques used in the attempt to evaluate the quality of unit-test. Meaning, how capable the unit-test is in catching errors.
+
+The metrics of unit-tests have become more important with the rise of industrial software unit-tests. The main metrics used are code/statement coverage, branch-coverage, path-coverage and the mutation-score \cite{UnitTestAdequacy}.
+I used statement-coverage, branch-coverage and the mutation score to evaluate my results.
+\\
+Metrics are a way to quantify the capabilities of a unit-test. But as with all tests, they can't cover every possible test case. 
+
+\epigraph{Program testing can be used to show the presence of bugs, but never to show their absence!}{Dijkstra } 
+
+Metrics combined with experience and an understanding of the environment are the best way to create high-quality unit-tests and ensure aptitude\cite{citation needed}.
+
+\subsection{Statement coverage}
+Statement coverage, also called code coverage, is a well-known metric that measures the lines that were executed during a unit-test. Higher code coverage can loosely be used to indicate a better the quality of the application.\cite{taufiqurrahmanCodeCoverage}. In this work i am going to exclusively use the term statement coverage. 
+
+\subsection{Branch coverage}
+Branch coverage detects junctions where the code could jump one line and measures which branches are tried out in testing. The score can be falsified by edge-cases like a \textit{while(true)} loop or branches which purposefully should never be accessed.
+The example below shows this possible grey zone.
+The \textit{while True} loop breaks if a condition is met. But because that gets decided outside the \textit{while}, and the condition \textit{True} never changes to \textit{False}, this gets a branch coverage score of 0.5 although the code works as intended.
+
+\begin{verbatim}
+while True:
+    if cond:
+        break
+    do_something()
+\end{verbatim}
+
+\subsection{Mutation score}
+The mutation score tries to expand the package of metrics used for unit-tests by artificially inserting errors in the original code. Those artificial, purposefully faulty versions of the original code are called \textit{mutations}. The expectation is that the test suite catches those errors, and if they don't, it should be a cue to correct the tests.\\
+Those mutations are isomorphic to each other. For instance changing a operator, number, relational operator or boolean, or changing an assignment to \textit{None}\\
+The selection of which operators are to be mutated are depended of the respective framework that is used. Most frameworks allow a selection of the mutations. However, generating and testing mutations can be computationally and time expensive depending on the thoroughness that is being used in the mutating.
+
+A further issue is that sometimes some numbers and operators may not be affecting the capabilities of the code, but express an aspect of the implementation but are still flagged as an error.
+
+That means that the mutation score as well is not the be-all and end-all of metrics and needs to be used with consideration for the surviving mutants and the surroundings. It is possible to mute lines of code by adding a "\# pragma: no mutate" at the end of the line but that is bothersome in larger projects and not always applicable.
+\subsection{Cyclomatic code complexity}
+Cyclomatic complexity is a software metric that measures the number of linearly independent paths through a program's source code. It works by analyzing the control flow graph of a program, counting decision points like if statements and loops. A higher cyclomatic complexity indicates more complex code. 
+
+I only use cyclomatic code complexity as a method to fine tune my prompt, and not as a metric for the generated unit-tests.
+
+\chapter{Related work}
+\label{RelatedWork}
+Paper with non LLM-Versions of unit-test generation
+other attempts of unit test generation with LLMs and their approaches
+Main paper which this work concentrates on
+    Their approach, data set, metric
+    compared to mine
+    their results
+    brief overview how i am different 
+
+After all concepts and keywords are explained, i will explore what techniques exist for generating unit-tests with and without the help of an LLM. 
+\section{Non-LLM Generation}
+//non LLM generation techniques
+
+
+
+\section{Generation with LLMs}
+The process to automatically generate unit-tests was already approached by several academic papers\cite{tufanoTestCaseGeneration} \cite{yang2024empiricalstudyunittest}, but the previous work with the most influence on my approach is Schaefer et al.\cite{Schaefer_automated_unit_test_generation}
+Schaefer et al. created a javascript library using chat-gpt 3.5 turbo to automatically generate unit-tests for 1684 API functions distributed over 25 freely available npm packages. The core of their approach is that their prompt contains context information. And if the querey fails, another one is send with the error message as additional information. \\Their prompt has the following structure:
 \begin{enumerate}
-%\itemsep-1.5em
-\item My static initialization prompt, which instructed the model to generate a unit-test with the information's available.
-\item A Task description, that was copied from the Task description and, if necessary, slightly adjusted.
-\item The code of the example solution, 
-\item The function name and signature,
-\item Unit-test examples of the example unit-test,
-\item The error message in the case of failure, so that errors could in the best case be specifically addressed and fixed.
+    \item function signature
+    \item code documentation taken from the docstring
+    \item usage of the function
+    \item the source code
+    \item the error message, if that is the second try
 \end{enumerate}
 
-
-There were two main static prompts needed for my application:
+My approach is build upon Schaefer et al. but extends their approach by:
 \begin{itemize}
-%\itemsep-1.5em
-\item The instruction prompt, that combined with the dynamically read task attributes forms the prompt for the model. 
-
-\\ \noindent\fbox{\begin{minipage}{\textwidth}
-\paragraph{Instruction prompt}
-The things above are the parts of the description of a programming task.
-Now write me a Unit test in python for to validate the code that was given above.
-Think of the imports. 
-Be thorough.
-\end{minipage}}\\
-I was forced to re-design the prompt a few times because GPT 3.5 was  suddenly forgetting, or misunderstanding important aspects. Examples were that suddenly no code was generated, only a textual directive on how to write a unit-test.
-
-\item The role description, which describes the role of the model in the interaction. I mainly used the role description to control the output of the model.
-\\ \noindent\fbox{\begin{minipage}{\textwidth}
-\paragraph{Role description:}
-You are an outstanding programmer, 
-but secluded and efficient. As a professional programmer you answer as concise and precise as possible without any unnecessary words
-\end{minipage}}\\
-This resulted in comparatively reliable results where the amount of unnecessary  text was reduced.
- 
+    \item extend the failure correction by another step where the llm is instructed not to fix, but to simply remove the part of the code that causes the error.
+    \item measuring the importance of the different informations that are incorporated by the prompt  
+    \item measuring the difference between chat-GPT 3.5 turbo, chat-GPT 4o, and two open source LLMs  
+    \item extending the naive prompt and refined prompt by a prompt that is refined by the same model that generates the unit-test.
 \end{itemize}
 
-\section{Training-data}
-I received 22 exercises which were exercises for the python entry course of Prof. Paaßen. Each of the 22 folders contained at least a Task description,an example unit-test and an example solution for the code. 
-\section{Pre-processing}
-I prepared each of the 22 Tasks manually by creating a "prompt" text-file and pasting the information's that are necessary in defined categories. That enabled me to then parse the information's for each task programmatically.
+I use a different baseline because their prompting strategy was not appilcable in my case.
+The prompt structure of Schaefer et al. is an incomplete test function that implies the need to complete said function. In my attempts of this strategy this led to very unreliable results. I suspect that the syntax difference of java-script and python might be the reason. The missing brackets in javascript a explicitly imply the missing content. But the same structure in python is a valid empty husk that doesen't imply missing features.
+
+
+\chapter{Methods}
+\label{Methods}
+In this section i present my implementation of the concepts introduced in "Background and related work" and extend those by other aspects of my work.
+
+\section{Data and pre-processing}
+I received 22 tasks as data for my eventual evaulation, which are tasks used in a university course "introduction to python". These task form the basis of my validation and testing of the automatic generation of unit-tests. Each task has its own folder with a task description, an example solution of the code and an accompanying unit-test with some asserts. Tasks $0,2,4,6,7,8,16 and 6$ were used in my validation of the "hyper-parameters" like selection of the refined prompt, code extraction and general performance optimization. 
+Tasks $1,3,5,9,10,11,12,13, 14, 15, 17, 18, 19, 20 and 21$ were only used for the production of the experiments.
+
+Because those tasks come from an introductory course for python, they all are 	comparatively easy exercises. But they were pretty inconsistent considering the quality of the description and sometimes the code needed to be adjusted.
+Furthermore some tasks which were created to illustrate basic python principles had code which was hard to convey semantically, for more details see \ref{Challanges:Data}.
+
+\begin{wrapfigure}[22]{r}{5.5cm}
+    \includegraphics[scale=0.4]{Process-Sequence2.drawio.png}
+    \caption{Process Sequence}
+    \label{fig:process-sequence}
+\end{wrapfigure}
+
+To use those tasks programmatically i created a "prompt" file which combined all the information's about the task in one file. The taskdescription, filename, functionname and textexamples of the respective tasks could then be easily parsed. 
+
+\section{Project flow}
+
+Here i roughly describe the flow of information in my project. 
+Graph \ref{fig:process-sequence} is an overview of the steps taken to get to a result. Further below figure \ref{fig:all_prompts} shows the composition of the different prompts. 
+
+The main sequence is that a prompt is send to an LLM model and code or written test cases are returned. 
+The terms to describe the prompts \textit{Initial Prompt},\textit{Fixing prompt} and \textit{Remove prompt} are used reliably throughout this work to describe the prompts and stages of the process, outlined in \ref{fig:process-sequence}.
+
+The returned written test cases are then used to complement a new prompt and the returned code is then evaluated. The first step in the evaluation is testing if the returned code is executable code. If so, its performance is getting checked by the test suite considering statement coverage, branch coverage and mutation score.  
+
+The following sections explain in deeper detail the specific steps.
+
+\section{LLMs}
+Large Language Models (LLMs) are the core component of this work, that interpret and then return generated code through prompts.
+They have comparable capabilities and , GPT-4o and llama3.1 with 70 billion parameters, are some of the most advanced LLMs actually available.
+
+I used chat-gpt(GPT) 3.5, GPT 4o, llama3.1 with 8 billion parameters and llama3.1 with 70 billion parameters. 
+GPT was used because of its accessibility and prominence and to be able to compare it to other models, i also included llama. For all of these i used an API endpoint to send my prompts to and in the case of the open source models i used an endpoint provided to me by my co-examiner Jesper Dannath.
+
+\section{Prompt-design}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Allprompt.png}
+    \caption{Composition of the different prompts}
+    \label{fig:all_prompts}
+\end{figure}
+
+Prompts are ,in the context of this work, query's in text form for the respective LLM and consist of different information's that can be included at will.
+
+\subsubsection{Textual instructions}
+Textual instructions are part of every prompt and are instructions in pure text form that formulate the desired result.
+
+The textual instruction in the init prompt exists in three different forms. \textit{Naive instruction}, \textit{refined instruction} and \textit{generated instruction}. The naive instruction is the baseline and is one simple sentence that requests a unit test with the information's above. The refined instruction is a more complicated text that describes the context, requests a unit-test and mentions the desirable aspects.
+The generated instruction uses the naive instruction as a basis and appends a list of test-cases to consider whilst writing the test. This list of test cases is generated beforehand by a previous request to the LLM.
+
+\subsection{Main prompts}
+Three main prompts are used to request unit-tests as pictured in \ref{fig:process-sequence}. Supporting those tasks are the role prompts.
+
+\subsubsection{Init Prompt}
+The init prompt contains the modular contents \textit{description}, \textit{functionname} and \textit{code}. Those are the information's which are later used in the experiments\ref{Experiments} and are read out from the "prompt" file in the task folders.
+
+At the end a single line demands the least amount of asserts. The cyclomatic complexity of the code is used as an indicator how many asserts get demanded. 
+
+\subsubsection{Fixing Prompt}
+When the init prompt doesn't result in a compiling unit-test a new prompt is sent to the LLM to fix the error in the existing unit-test. For that the contextual informations of the unit-test, original code and the resulting error are included. 
+
+\subsubsection{Removing Prompt}
+If the original error still persists, a last try is made by removing the lines causing the malfunction of the unit-test. Often the remaining lines still lead to a unit-test with good metrics.
+
+\subsection{Role Prompts}
+Role prompts are used in this work in an effort to control the output format of the LLM. The validation phase was completed with GPT 3.5 turbo, where the role prompts had a high effect. The llama models on the other hand seemed to use the role prompts more as a suggestion than a framework. That lead to a reduced success rate which is explained in more detail bewlo \ref{Experiments}.
+
+Two role prompts are used, a \textit{coder role} and a \textit{writer role}. The coder role prompt uses intensive language to urge the LLM to only output code without any accompanying text. The writer role prompt does the exact opposite and demands only written text.
+
+The coder role is utilized in the generation of unit tests and the writer role is used in the generation of possible test cases when using the generated instruction.
+ 
 \section{Post-processing and validation}
-When receiving the code i wrote a small parser that extracted the code from the resulting string and put that into a temporary file to run the unit-test.
-The unit-test was then tested and the return value determined if a new attempt was to be made.
-\section{Strategies for failures}
-If the generated unit-test did not execute correctly although it should have, a new prompt is send to the model accompanied by the produced error message. 
+Extracting the useful code from the return string is essential to generate usable code and has a large impact regarding the performance. For example 
 
-If after that the result still doesn't compile, another prompt is send with the query to remove the faulty line. That is done to at least have a compiling test result in the end.
-\\The structured prompt could look like this:
+\text
+That is done through two functions in \textit{utils.py}. The first detects the block of code. And the second takes that block of code and adjusts import statements if necessary and adds a "\textit{\text{\# pragma: no cover}}" to exclude \textit{\text{if \_\_name\_\_ == "\_\_main\_\_":}} from the statement coverage evaluation because the \textit{if} counts as branch.   
 
+My implementation of the post-processing is lacking because there are several edge cases which are not accountant for. For example if the LLM sends the code in two parts, those parts are not connected and only one block of incomplete code is going to lead to an incorrect unit-test.
 
-\section{provide overview diagram illustrating my steps}
+\section{Evaluation through test suite}
+If testing the generated code with pytest results in a return value of 0, that generated unit-test counts as valid and is then being run through the test suite.
 
-\chapter{Implementation}
-\section{ Code examples}
+\subsection{Statement coverage and branch coverage}
+The python package \textit{coverage} is used to measure statement coverage and branch coverage.
+
+The final statement coverage is the percentage of line of the original code that are being executed in the unit-test.
+Branch coverage checks all if all the possible branches in junctions are being tested by the unit-test with the issues mentioned in the background section \ref{Background}.
+
+\subsection{Mutation coverage}
+\textit{Mutmut} is used as the mutation score evaluation tool with no special options used. This package works exactly as outlined in the backgrounds section \ref{Background}. But in detail it differentiates the mutation results into four categories. \textit{Killed} mutants which is the desired state of detecting mutations in the code. The second category is \textit{timeout}, which means that an induced mutation lead to an execution time 10 times higher than the mutmut baseline and counts as killed. \textit{Suspicious} means that the testing took a long time but not long enough to be flagged as timeout. The last category is \textit{survived} which means that an induced mutation did not change the outcome of the unit-test. 
+
+In this project only the \textit{killed} mutations are counted as success. Based upon the simplicity of the data set, few cases of \textit{timeout} or \textit{suspicious} emerge.
+
+\section{Challenges}
+\subsubsection{LLM usage}
+I included the llama3.1 model too late and therefore had more time invested in the adaptation to the chat-GPT models and part of llamas worse performance may well be insufficient adjustment. Further i overfit my validation case by mostly validating with the \textit{few-shot with code}-case.
+
+Another problem with llama3.1 is that it responded quite bad to the role prompting and i could not find a replacement parameter with which i could exercise enough control over the output. That is important because role-prompting is a big part of controlling the correct output that is extractable. 
+For example the llama model had a tendency to respond with less code and more textual assistance on how to write the code instead of writing it. That made it impossible to instruct valid code out of it and therefore lead to worse capabilities in the experiments \ref{Experiments}.
+
+\subsubsection{Data}
+\label{Challanges:Data}
+
+The data varied fairly much in quality and some tasks needed manual repairs to make them usable, others were excluded. 
+
+For instance task 2, "breakfast",  is the exercise to append some substrings to a given parameter string. That task is not demanding, but it is convoluted and if the LLM has the assignment to create a unit-test for that task without seeing the actual code, it ultimately is only guessing how the source code looks like. That results in high error rates, whereas if the code is included, the test generation succeeds quite easily.
+
+The problem is far less present in tasks where the code leaves less room for interpretation.
+
+Additionally worth mentioning is task number 8 in which the task is to write a function that greets a parameter name and then greets Alice and Bob. That easy task proved to be quite a challange in the validation phase.
+
+\subsubsection{Prompt design}
+
+I tried to implement the base line of Schaefer et al.\cite{Schaefer_automated_unit_test_generation}, but that failed to generate any kind of usable results. Schaefer et al. used the incomplete upper half of a javascript, testing function with additional informations included above the function header. 
+
+I suspect that that approach failed in my implementation because a python function header lacks brackets that clearly indicates. 
 
 \chapter{Experiments}
-\section{baselines}
+\label{Experiments}
 
-\section{what i want to show}
-\section{how i want to show it}
-\section{baselines and assumptions}
-\section{what was my initial assumption}
-\section{Table for experiments}
-\section{Discussion of the results}
+The core aspect of this work is the generation and interpretation of the gained data. This chapter explains how the testing was done and the chapter below \ref{Discussion} interprets that data. The tables with the data are found at \ref{table:gpt35}\ref{table:gpt4o}\ref{table:resultsLLama7b}.
+
+I used the method explained in the chapter "methods"\ref{Methods}, and implemented it in on a bigger scale, in a structured way to then make statements about the the performance of the LLMs, the prompts and the necessity of the information's needed to generate a unit-test.
+
+\section{Test setup}
+\label{testSetup}
+The smallest unit is the \textit{single run}. In that, one cycle of unit-test generation is carried out for a certain LLM model, selected task from the data set and with particular selection of prompt information's, as outlined in figure \ref{fig:process-sequence}.
+That single run results in working code or not. A single run that doesn't result in working code is referenced as \textit{faulty run}, if it results in successful code it is a \textit{successful run}. 
+Important to note is that a successful run can still be a bad generated unit-test because some way the return from the LLM was faulty or the correct extraction of code did not work.  
+
+\begin{verbatim}
+Return from successful run:
+[1.0, 1.0, 1.0, True, True, False, False]
+\end{verbatim}\\
+\begin{verbatim}
+Still a successful run:
+[0, 0, 0, True, False, False, True]
+\end{verbatim}
+\label{verbatim:returnFromRun}
+
+In either case the single run returns the statement coverage, branch coverage, mutation coverage, a boolean if the code works in the end and three flags, if the code worked the first time or got repaired or the faulty line got removed.
+
+That \textit{single run} is then encapsulated in a \textit{repetition}. 
+That repetition aims for 4 successful runs, if a run is faulty it just tries again. After 4 successful runs or 8 faulty runs, the repetition return the average of the so far executed successful runs. That limit of 8 faulty runs is necessary because else some parameter combinations would result in an endless loop.
+
+That \textit{repetition} is then further encapsulated in a \textit{transversal} which systematically tests the spectrum of parameter possibilities to generate the data. It tests over all 22 tasks, and each task gets tested for three different prompt methods \ref{fig:experiment-setup}.
+
+This results in a minimum amount of $22*3*4=264$ single runs. Each single run has one to three api calls for the normal prompt, and two to four api calls for the refined prompt. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{experiment_setup.drawio.png}
+    \caption{The test setup, figure in single run is \ref{fig:process-sequence}}
+    \label{fig:experiment-setup}
+\end{figure}
+
+1\section{Explaining the data}
+Each table \ref{table:gpt35}\ref{table:gpt4o}\ref{table:resultsLLama7b} represents the data for one model. Each model was tested with the three prompt strategies explained above \ref{fig:all_prompts}, and each prompt was tested with four different compositions of information. 
+The first category \textit{only task-description}, is the prompt only containing the task description and each following category also contains the task description.
+
+
+\begin{table}[!ht]
+    \centering
+    \label{table:exampleTable}
+    \resizebox{250*\textwidth}{!}{\begin{tabular}{|l|l|l|}
+    \hline
+        GPT-3.5 turbo (model) & ~ & ~ \\ \hline
+        Naive Prompt (prompt): & ~ & ~ \\ \hline
+        Only Task-description (category): & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov (metric): & 0.616 \\ \hline
+        ~ & Branch Cov: & 0.603 \\ \hline
+        ~ & Mutation Score: & 0.769 \\ \hline
+        ~ & \% of success first try: & 0.813 \\ \hline
+        ~ & \% of success fixing: & 0.063 \\ \hline
+        ~ & \% of success remov: & 0.125 \\ \hline
+        ~ & Avrg n of falliures: & 2.462 \\ \hline
+    \end{tabular}}
+    \caption{Section of data which illustrates the table structure}
+\end{table}
+
+\textit{Few-shot without code} includes few-shot examples from the available example asserts and \textit{zero-shot with code} only adds the source code to the task description. The last category contains all information's available for the task.
+
+Each composition of information is then measured for statement coverage, branch coverage and the mutation score(\ref{metricsForEvaluationOfUnitTest}). The three following metrics \textit{\"\% of success...\"} describe the percentage of unit-tests that were successfully created in the first try, where fixing lead to a working result and where removing the error causing line lead to success. Following the fixing efforts outlines in the process sequence\ref{fig:process-sequence}.
+
+The last metric is the average number of faulty runs produced in a \textit{repetition}\ref{testSetup}, with a maximum of 8 possible faulty runs in a repetition. This has some	accompanying expressiveness over how the LLM model is struggling with the available information's. 
+
+\section{Baseline}
+As my baseline is use chat-GPT 3.5 turbo with the \textit{naive prompt} containing only the \textit{task description}. That Baseline is not directly comparable to Schaefer et al.\cite{Schaefer_automated_unit_test_generation} but it represents the intuitive, naive attempt with little effort that compares well to improved efforts. 
+
+\chapter{Discussion}
+Here i interpret the results of the experiments and add meaning and statement to the numbers.
+\label{Discussion}
+\section{Assumptions}
+
+My assumptions was that the chat-gpt 4o mode with the refined prompt, containing all the possible information's, would perform best.
+<insert findings about data>
+
+easy statements first, 4o better than 3.5
+best and worst categories
+
+\section{models}
+compare models
+    add stmnt, branch and mut together and the prompts, and max is best
+    llama had far more errors generated
+    llama profitet most from the generated prompts
+
+3.5 turbo was strong in success first try" across all prompts
+    was maybe because the validation occured on that set
+
+4o better mutation score across all prompts
+    maybe better at writing more robust test cases
+
+
+llama less failures with better prompts
+
+\section{prompts}
+calculate average difference in model when prompt is changed 
+prompts have an effect!
+main question, did the prompts change something
+
+measure how different performance of models is with different prompt designs
+    4o is pretty stable all across
+
+did the generation of the prompt help
+    did the generation of prompt lead to better scores in harder tasks?
+    
+\section{categories}
+few shot generally performs better than no shot attempts
+
+\section{metrics}
+fixing the code seems to have been hard
+how effective was the fixing
+    does the amount of errors correlate with the fixing?
+    in what amount lead "removing" to tests with 0\% all over?
+
+amount of errors is a statement about sure the LLM was?!
+    do less errors correlate with better scores?!
+
+\section{tasks}
+
+which where the hardest tasks
+
+
+\section{caution}
+there are sometimes strange numbers in the table like 0.0 or 1.0 where there shouldn't be or coincidences like same numbers. I cant exclude errors on my part, but in the end this is not an immense amount of points in the data per column. Maybe its also because of the success distribution. In tasks where it succeded it mostly succeded with perfect scores. But if it failed, it most often failed with 0\% on all fronts.
+
+
+
+
+
+reference main question of the ba
+reference results with results from neighbouring papers
 
 \chapter{Conclusion}
-\section{re-telling of the paper}
-\section{high-level overview of experimental results}
-\section{Limitations}
-\section{what future work could accomplish}
-\section{final words}
+recap aim,procedure and results and use the findings of the discussion to come to a final statement considering the ba question and relate to other papers
+\section{Hypothesis and main question}
+\label{Conclusion}
+re-telling of the paper
+high-level overview of experimental results
+Limitations
+what future work could accomplish
+final words
 		
 \newpage
 			
 \chapter{latex features}
-\\ \noindent\fbox{\begin{minipage}{\textwidth}
+\noindent\fbox{\begin{minipage}{\textwidth}
 \paragraph{Lemma} Let the coefficients of the polynomial
 $$a_0+a_1x+a_2x^2+\cdots+a_{m-1}x^{m-1}+x^m$$ be integers. 
 Then any real root of the polynomial is either integral or irrational.
@@ -192,13 +459,165 @@ Did you know? The discrete fourier transformation shown in equation \ref{eqn:dft
 		
 \begin{align}
 	f_m  \label{eqn:dft}
-\end{alig
-n}
+\end{align}
 For words of science, see \cite{botsch2010polygon}. Unfortunately, that book has nothing about \glspl{wolf}.
 
+\chapter{Figures}
+
+\newpage
+%generated with: https://tableconvert.com/excel-to-latex
+\begin{table}[!ht]
+    \label{table:gpt35}
+    \caption{Results for 3.5 turbo}
+    \centering
+    \resizebox{500*\textwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+    \hline
+        GPT-3.5 turbo & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \\ \hline
+        Naive Prompt: & ~ & ~ & ~ & Refined Prompt: & ~ & ~ & ~ & Generated-Prompt & ~ & ~ \\ \hline
+        Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.616 & ~ & ~ & Stmnt. Cov: & 0.760 & ~ & ~ & Stmnt. Cov: & 0.629 \\ \hline
+        ~ & Branch Cov: & 0.603 & ~ & ~ & Branch Cov: & 0.742 & ~ & ~ & Branch Cov: & 0.731 \\ \hline
+        ~ & Mutation Score: & 0.769 & ~ & ~ & Mutation Score: & 0.788 & ~ & ~ & Mutation Score: & 0.962 \\ \hline
+        ~ & \% of success first try: & 0.813 & ~ & ~ & \% of success first try: & 0.909 & ~ & ~ & \% of success first try: & 0.923 \\ \hline
+        ~ & \% of success fixing: & 0.063 & ~ & ~ & \% of success fixing: & 0.023 & ~ & ~ & \% of success fixing: & 0.038 \\ \hline
+        ~ & \% of success remov: & 0.125 & ~ & ~ & \% of success remov: & 0.068 & ~ & ~ & \% of success remov: & 0.038 \\ \hline
+        ~ & Avrg n of falliures: & 2.462 & ~ & ~ & Avrg n of falliures: & 2.231 & ~ & ~ & Avrg n of falliures: & 1.462 \\ \hline
+        Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.536 & ~ & ~ & Stmnt. Cov: & 0.732 & ~ & ~ & Stmnt. Cov: & 0.606 \\ \hline
+        ~ & Branch Cov: & 0.595 & ~ & ~ & Branch Cov: & 0.723 & ~ & ~ & Branch Cov: & 0.679 \\ \hline
+        ~ & Mutation Score: & 0.795 & ~ & ~ & Mutation Score: & 0.827 & ~ & ~ & Mutation Score: & 0.942 \\ \hline
+        ~ & \% of success first try: & 0.718 & ~ & ~ & \% of success first try: & 0.827 & ~ & ~ & \% of success first try: & 0.923 \\ \hline
+        ~ & \% of success fixing: & 0.077 & ~ & ~ & \% of success fixing: & 0.000 & ~ & ~ & \% of success fixing: & 0.019 \\ \hline
+        ~ & \% of success remov: & 0.205 & ~ & ~ & \% of success remov: & 0.173 & ~ & ~ & \% of success remov: & 0.058 \\ \hline
+        ~ & Avrg n of falliures: & 2.308 & ~ & ~ & Avrg n of falliures: & 0.846 & ~ & ~ & Avrg n of falliures: & 1.615 \\ \hline
+        Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.597 & ~ & ~ & Stmnt. Cov: & 0.881 & ~ & ~ & Stmnt. Cov: & 0.654 \\ \hline
+        ~ & Branch Cov: & 0.641 & ~ & ~ & Branch Cov: & 0.875 & ~ & ~ & Branch Cov: & 0.712 \\ \hline
+        ~ & Mutation Score: & 0.827 & ~ & ~ & Mutation Score: & 0.885 & ~ & ~ & Mutation Score: & 0.885 \\ \hline
+        ~ & \% of success first try: & 0.854 & ~ & ~ & \% of success first try: & 0.958 & ~ & ~ & \% of success first try: & 0.865 \\ \hline
+        ~ & \% of success fixing: & 0.042 & ~ & ~ & \% of success fixing: & 0.000 & ~ & ~ & \% of success fixing: & 0.019 \\ \hline
+        ~ & \% of success remov: & 0.104 & ~ & ~ & \% of success remov: & 0.042 & ~ & ~ & \% of success remov: & 0.115 \\ \hline
+        ~ & Avrg n of falliures: & 1.000 & ~ & ~ & Avrg n of falliures: & 1.077 & ~ & ~ & Avrg n of falliures: & 0.385 \\ \hline
+        Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.440 & ~ & ~ & Stmnt. Cov: & 0.823 & ~ & ~ & Stmnt. Cov: & 0.630 \\ \hline
+        ~ & Branch Cov: & 0.554 & ~ & ~ & Branch Cov: & 0.824 & ~ & ~ & Branch Cov: & 0.746 \\ \hline
+        ~ & Mutation Score: & 0.731 & ~ & ~ & Mutation Score: & 0.885 & ~ & ~ & Mutation Score: & 0.885 \\ \hline
+        ~ & \% of success first try: & 0.558 & ~ & ~ & \% of success first try: & 0.865 & ~ & ~ & \% of success first try: & 0.827 \\ \hline
+        ~ & \% of success fixing: & 0.173 & ~ & ~ & \% of success fixing: & 0.019 & ~ & ~ & \% of success fixing: & 0.058 \\ \hline
+        ~ & \% of success remov: & 0.269 & ~ & ~ & \% of success remov: & 0.115 & ~ & ~ & \% of success remov: & 0.115 \\ \hline
+        ~ & Avrg n of falliures: & 1.077 & ~ & ~ & Avrg n of falliures: & 0.538 & ~ & ~ & Avrg n of falliures: & 0.923 \\ \hline
+    \end{tabular}}
+\end{table}
+\begin{table}[!ht]
+    \centering
+    \caption{Results for GPT-4o}
+    \label{table:gpt4o}
+    \resizebox{500*\textwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+    \hline
+        GPT-4o & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \\ \hline
+        Naive Prompt: & ~ & ~ & ~ & Refined Prompt: & ~ & ~ & ~ & Generated-Prompt & ~ & ~ \\ \hline
+        Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.781 & ~ & ~ & Stmnt. Cov: & 0.684 & ~ & ~ & Stmnt. Cov: & 0.684 \\ \hline
+        ~ & Branch Cov: & 0.735 & ~ & ~ & Branch Cov: & 0.692 & ~ & ~ & Branch Cov: & 0.692 \\ \hline
+        ~ & Mutation Score: & 0.418 & ~ & ~ & Mutation Score: & 0.433 & ~ & ~ & Mutation Score: & 0.433 \\ \hline
+        ~ & \% of success first try: & 0.726 & ~ & ~ & \% of success first try: & 0.667 & ~ & ~ & \% of success first try: & 0.667 \\ \hline
+        ~ & \% of success fixing: & 0.131 & ~ & ~ & \% of success fixing: & 0.050 & ~ & ~ & \% of success fixing: & 0.050 \\ \hline
+        ~ & \% of success remov: & 0.143 & ~ & ~ & \% of success remov: & 0.283 & ~ & ~ & \% of success remov: & 0.283 \\ \hline
+        ~ & Avrg n of falliures: & 1.533 & ~ & ~ & Avrg n of falliures: & 2.200 & ~ & ~ & Avrg n of falliures: & 2.200 \\ \hline
+        Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.815 & ~ & ~ & Stmnt. Cov: & 0.803 & ~ & ~ & Stmnt. Cov: & 0.803 \\ \hline
+        ~ & Branch Cov: & 0.792 & ~ & ~ & Branch Cov: & 0.785 & ~ & ~ & Branch Cov: & 0.785 \\ \hline
+        ~ & Mutation Score: & 0.500 & ~ & ~ & Mutation Score: & 0.550 & ~ & ~ & Mutation Score: & 0.550 \\ \hline
+        ~ & \% of success first try: & 0.767 & ~ & ~ & \% of success first try: & 0.750 & ~ & ~ & \% of success first try: & 0.750 \\ \hline
+        ~ & \% of success fixing: & 0.117 & ~ & ~ & \% of success fixing: & 0.067 & ~ & ~ & \% of success fixing: & 0.067 \\ \hline
+        ~ & \% of success remov: & 0.117 & ~ & ~ & \% of success remov: & 0.183 & ~ & ~ & \% of success remov: & 0.183 \\ \hline
+        ~ & Avrg n of falliures: & 0.600 & ~ & ~ & Avrg n of falliures: & 0.600 & ~ & ~ & Avrg n of falliures: & 0.600 \\ \hline
+        Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.933 & ~ & ~ & Stmnt. Cov: & 0.906 & ~ & ~ & Stmnt. Cov: & 0.906 \\ \hline
+        ~ & Branch Cov: & 0.933 & ~ & ~ & Branch Cov: & 0.906 & ~ & ~ & Branch Cov: & 0.906 \\ \hline
+        ~ & Mutation Score: & 0.533 & ~ & ~ & Mutation Score: & 0.572 & ~ & ~ & Mutation Score: & 0.572 \\ \hline
+        ~ & \% of success first try: & 0.900 & ~ & ~ & \% of success first try: & 0.883 & ~ & ~ & \% of success first try: & 0.883 \\ \hline
+        ~ & \% of success fixing: & 0.033 & ~ & ~ & \% of success fixing: & 0.022 & ~ & ~ & \% of success fixing: & 0.022 \\ \hline
+        ~ & \% of success remov: & 0.067 & ~ & ~ & \% of success remov: & 0.094 & ~ & ~ & \% of success remov: & 0.094 \\ \hline
+        ~ & Avrg n of falliures: & 0.533 & ~ & ~ & Avrg n of falliures: & 0.533 & ~ & ~ & Avrg n of falliures: & 0.533 \\ \hline
+        Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.789 & ~ & ~ & Stmnt. Cov: & 0.883 & ~ & ~ & Stmnt. Cov: & 0.883 \\ \hline
+        ~ & Branch Cov: & 0.772 & ~ & ~ & Branch Cov: & 0.883 & ~ & ~ & Branch Cov: & 0.883 \\ \hline
+        ~ & Mutation Score: & 0.533 & ~ & ~ & Mutation Score: & 0.567 & ~ & ~ & Mutation Score: & 0.567 \\ \hline
+        ~ & \% of success first try: & 0.633 & ~ & ~ & \% of success first try: & 0.883 & ~ & ~ & \% of success first try: & 0.883 \\ \hline
+        ~ & \% of success fixing: & 0.167 & ~ & ~ & \% of success fixing: & 0.000 & ~ & ~ & \% of success fixing: & 0.000 \\ \hline
+        ~ & \% of success remov: & 0.200 & ~ & ~ & \% of success remov: & 0.117 & ~ & ~ & \% of success remov: & 0.117 \\ \hline
+        ~ & Avrg n of falliures: & 0.200 & ~ & ~ & Avrg n of falliures: & 0.267 & ~ & ~ & Avrg n of falliures: & 0.267 \\ \hline
+    \end{tabular}}
+\end{table}
+\begin{table}[!ht]
+    \centering
+    \label{table:resultsLLama7b}
+    \caption{Results for llama 3.1 8b}
+    \resizebox{500*\textwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+    \hline
+        Llama3.1 8b & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \\ \hline
+        Naive Prompt: & ~ & ~ & ~ & Refined Prompt: & ~ & ~ & ~ & Generated-Prompt & ~ & ~ \\ \hline
+        Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ & ~ & Only Task-description: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.631 & ~ & ~ & Stmnt. Cov: & 0.424 & ~ & ~ & Stmnt. Cov: & 0.778 \\ \hline
+        ~ & Branch Cov: & 0.621 & ~ & ~ & Branch Cov: & 0.417 & ~ & ~ & Branch Cov: & 0.764 \\ \hline
+        ~ & Mutation Score: & 0.610 & ~ & ~ & Mutation Score: & 0.433 & ~ & ~ & Mutation Score: & 0.800 \\ \hline
+        ~ & \% of success first try: & 0.596 & ~ & ~ & \% of success first try: & 0.568 & ~ & ~ & \% of success first try: & 0.827 \\ \hline
+        ~ & \% of success fixing: & 0.154 & ~ & ~ & \% of success fixing: & 0.023 & ~ & ~ & \% of success fixing: & 0.054 \\ \hline
+        ~ & \% of success remov: & 0.250 & ~ & ~ & \% of success remov: & 0.409 & ~ & ~ & \% of success remov: & 0.119 \\ \hline
+        ~ & Avrg n of falliures: & 3.333 & ~ & ~ & Avrg n of falliures: & 5.000 & ~ & ~ & Avrg n of falliures: & 4.267 \\ \hline
+        Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ & ~ & Few-shot without code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.806 & ~ & ~ & Stmnt. Cov: & 0.617 & ~ & ~ & Stmnt. Cov: & 0.755 \\ \hline
+        ~ & Branch Cov: & 0.826 & ~ & ~ & Branch Cov: & 0.617 & ~ & ~ & Branch Cov: & 0.751 \\ \hline
+        ~ & Mutation Score: & 0.800 & ~ & ~ & Mutation Score: & 0.617 & ~ & ~ & Mutation Score: & 0.717 \\ \hline
+        ~ & \% of success first try: & 0.689 & ~ & ~ & \% of success first try: & 0.577 & ~ & ~ & \% of success first try: & 0.683 \\ \hline
+        ~ & \% of success fixing: & 0.161 & ~ & ~ & \% of success fixing: & 0.135 & ~ & ~ & \% of success fixing: & 0.083 \\ \hline
+        ~ & \% of success remov: & 0.150 & ~ & ~ & \% of success remov: & 0.288 & ~ & ~ & \% of success remov: & 0.233 \\ \hline
+        ~ & Avrg n of falliures: & 2.133 & ~ & ~ & Avrg n of falliures: & 4.467 & ~ & ~ & Avrg n of falliures: & 4.133 \\ \hline
+        Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ & ~ & Zero-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.742 & ~ & ~ & Stmnt. Cov: & 0.583 & ~ & ~ & Stmnt. Cov: & 0.806 \\ \hline
+        ~ & Branch Cov: & 0.733 & ~ & ~ & Branch Cov: & 0.583 & ~ & ~ & Branch Cov: & 0.797 \\ \hline
+        ~ & Mutation Score: & 0.700 & ~ & ~ & Mutation Score: & 0.517 & ~ & ~ & Mutation Score: & 0.828 \\ \hline
+        ~ & \% of success first try: & 0.769 & ~ & ~ & \% of success first try: & 0.795 & ~ & ~ & \% of success first try: & 0.839 \\ \hline
+        ~ & \% of success fixing: & 0.096 & ~ & ~ & \% of success fixing: & 0.000 & ~ & ~ & \% of success fixing: & 0.048 \\ \hline
+        ~ & \% of success remov: & 0.135 & ~ & ~ & \% of success remov: & 0.205 & ~ & ~ & \% of success remov: & 0.113 \\ \hline
+        ~ & Avrg n of falliures: & 2.600 & ~ & ~ & Avrg n of falliures: & 3.667 & ~ & ~ & Avrg n of falliures: & 3.333 \\ \hline
+        Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ & ~ & Few-shot with code: & ~ & ~ \\ \hline
+        ~ & Stmnt. Cov: & 0.840 & ~ & ~ & Stmnt. Cov: & 0.763 & ~ & ~ & Stmnt. Cov: & 0.823 \\ \hline
+        ~ & Branch Cov: & 0.824 & ~ & ~ & Branch Cov: & 0.760 & ~ & ~ & Branch Cov: & 0.819 \\ \hline
+        ~ & Mutation Score: & 0.783 & ~ & ~ & Mutation Score: & 0.700 & ~ & ~ & Mutation Score: & 0.828 \\ \hline
+        ~ & \% of success first try: & 0.850 & ~ & ~ & \% of success first try: & 0.827 & ~ & ~ & \% of success first try: & 0.887 \\ \hline
+        ~ & \% of success fixing: & 0.000 & ~ & ~ & \% of success fixing: & 0.058 & ~ & ~ & \% of success fixing: & 0.000 \\ \hline
+        ~ & \% of success remov: & 0.150 & ~ & ~ & \% of success remov: & 0.115 & ~ & ~ & \% of success remov: & 0.113 \\ \hline
+        ~ & Avrg n of falliures: & 1.800 & ~ & ~ & Avrg n of falliures: & 2.933 & ~ & ~ & Avrg n of falliures: & 3.667 \\ \hline
+    \end{tabular}}
+\end{table}
+
+\newpage
 \backmatter
 \printglossaries
 \printbibliography[heading=bibintoc]
-
+\noindent\fbox{\begin{minipage}{\textwidth}
+\-This is the task-description:\\
+Create a function that checks if a given list of numbers contains any negative numbers. The function should return True if there are negative numbers and False otherwise. (**HINT** you can use "any()" to check the list)
+\\\\
+the code is located in the file named:'example\_solution.py', so think of importing the file \\\\
+\-This is the functionname:\\
+contains\_negative(numbers)\\\\
+\-These are the 2 testexamples:\\
+assert contains\_negative([1, 2, 3, 4, 5]) == False, "There is no negative numbers in [1, 2, 3, 4, 5]"\\
+assert contains\_negative([1, 2, -3, 4, 5]) == True, "There is a negative numbers in [1, 2, -3, 4, 5]"\\\\
+\-This is the written code:\\
+\-!function!\-\\
+def contains\_negative(numbers):\\
+\-!prefix!\-\\
+    return any(num < 0 for num in numbers)\\\\
+The things above are the parts of the description of a programming task.\\
+Now write me a Unit test in python for to validate the code that was given above.\\
+Think of the imports.\\
+Be thourough.\\
+Write at least 4 Assertions!
+\label{prompt_construction_1}
+\end{minipage}}\\
 \end{document}
 
