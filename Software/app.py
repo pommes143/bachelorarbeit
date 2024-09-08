@@ -6,6 +6,7 @@ import aiohttp
 import asyncio
 from enum import Enum
 import numpy as np
+from datetime import datetime
 
 
 #task used for prompt homing: 0,2,7
@@ -14,8 +15,8 @@ INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST=read_from_file("prompts/naive_init_pr
 FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT="prompts/fixing_prompt.txt"
 PROMPT_GENERATE_BY_LLM = "prompts/redesign_prompt.txt"
 
-
-LIST_OF_TASKS_USED_FOR_VALIDATION=[0,2,4,7,8,16] 
+#6 added because with the expectations of numpy lists and complicated expectations of order it lead to a lot of issues
+LIST_OF_TASKS_USED_FOR_VALIDATION=[0,2,4,7,8,16,6] 
 PRINT_VERBOSE = True
 ROLE_CODER = read_from_file("roles/coder.txt")
 ROLE_WRITER = read_from_file("roles/writer.txt")
@@ -28,7 +29,8 @@ FOLDER_WITH_THE_SUBFOLDER_OF_EXAMPLES="/home/rpommes/1Zentrum/Uni/24SoSe/Bachelo
 class models(Enum):
     GPT35 = "gpt-3.5-turbo"
     GPT4 = "gpt-4o"
-    LLAMA8B = "llama3.1" 
+    LLAMA8B = "llama3.1:8b" 
+    LLAMA70B = "llama3.1:70b" 
 
 def does_the_unit_test_run_successfully(filename):
     val =subprocess.call(f"./execute_test.sh {filename} &> {LOGGING_OF_LAST_EXECUTED_UNIT_TEST}", shell = True, executable="/bin/sh")
@@ -37,6 +39,17 @@ def does_the_unit_test_run_successfully(filename):
     else:
         return False
     
+def return_mutmut_score(filename):
+    with open(filename, "r") as file:
+        last_line = file.readlines()[-1].strip()
+    if("KILLED" not in last_line):
+        print("There doesen't exist a mutation score")
+        return 1.0
+    killed_count = int(last_line.split("KILLED")[1].split()[0])
+    denominator = int(last_line.split()[1].split('/')[1])
+    result = killed_count / denominator
+    return result
+
 def run_test_suite(code_filename,test_filename):
     #verage
     code_cov = 0
@@ -52,11 +65,15 @@ def run_test_suite(code_filename,test_filename):
         try:
             code_cov = next(int(word.rstrip('%')) for line in read_from_file("logging/code_cov.txt").splitlines() if code_filename in line for word in reversed(line.split()) if word.endswith('%'))/100
         except:
+            print("coverage file could not been opened\n" if PRINT_VERBOSE else "",end='')
             code_cov = d["totals"]["percent_covered"]
         if(d["totals"]["num_branches"] == 0):
             branch_cov = 1.0
         else:
             branch_cov = d["totals"]["covered_branches"]/d["totals"]["num_branches"]
+        
+        if(code_cov >1.0):
+            code_cov = code_cov/100
         print(f"\ncode coverage: {code_cov}\n" if PRINT_VERBOSE else "",end='')
         print(f"branch coverage: {branch_cov}\n" if PRINT_VERBOSE else "",end='')
 
@@ -65,9 +82,12 @@ def run_test_suite(code_filename,test_filename):
     subprocess.call(f"coverage erase", shell = True, executable="/bin/sh")
     #Mutation score
     subprocess.call(f"mutmut run --paths-to-mutate {code_filename} --tests-dir {test_filename} --simple-output &> logging/mutmut_score.txt", shell = True, executable="/bin/sh")
-    mutmut_score = (read_from_file("logging/mutmut_score.txt").strip().split('\n')[-1].split()[1].split('/'))
-    
-    mutmut_score = int(mutmut_score[0])/int(mutmut_score[1])
+    try:
+        mutmut_score = return_mutmut_score("logging/mutmut_score.txt")
+    except:
+        print("!!!Could not read mutmut score")
+        mutmut_score = 1.0
+   
     if(code_cov >1.0):
         code_cov = code_cov/100
     print(f"mutmut score: {mutmut_score}\n" if PRINT_VERBOSE else "",end='')
@@ -96,6 +116,7 @@ def send_prompt_to_model(prompt, role_description, model):
     
 def generate_languag_gpt(prompt, role_description, model):
     client = OpenAI(api_key="")
+    print(f"{"#"*120}\nprompt:\n{prompt}\n{"#"*120}\n" if PRINT_VERBOSE else "",end='')
     print(f"Sending prompt!...\n" if PRINT_VERBOSE else "",end='')
     chat_completion = client.chat.completions.create(
         messages=[
@@ -111,46 +132,68 @@ def generate_languag_gpt(prompt, role_description, model):
     return chat_completion.choices[0].message.content
 
 async def generate_language_ollama(prompt, role_description, model): 
-    ollama_url = "https://ny4c9zz4bzfbey-11434.proxy.runpod.net/" 
-    print(f"{"#"*120}\nprompt:\n{prompt}\n{"#"*120}")
+    ollama_url = "https://lcpgl5tgnj9irp-11434.proxy.runpod.net/" 
+    print(f"{"#"*120}\nprompt:\n{prompt}\n{"#"*120}\n" if PRINT_VERBOSE else "",end='')
     print(f"Sending prompt!...\n" if PRINT_VERBOSE else "",end='')
+    options= {
+    "temperature": 0.2
+    }
+    messages = [{
+      "role": "user",
+      "content": "Could you write me this unit-test"
+    },
+    {
+      "role": "assistant",
+      "content": """```python
+      def unit_test():
+        assert equal()
+
+      if __name__ == '__main__': 
+        unittest.main()
+      ```"""
+    },]
     async with aiohttp.ClientSession() as session: 
         payload = { 
         "model": model, 
         "prompt": prompt, 
         "stream": False, 
-        #"options": {"num_predict": max_tokens},
+        "system": role_description,
+        "message":messages,
+        "options":options
         } 
 
         if not role_description is None: 
-            payload["system"] = role_description 
+            #payload["system"] = "you are a clown and write as much nonsense as possible" 
             async with session.post(f"{ollama_url}api/generate", json=payload) as response: 
                 text = await response.text() 
                 text = json.loads(text)["response"] 
     print(f"...Received result from ollama\n" if PRINT_VERBOSE else "",end='')
-    print(f"{"#"*120}\nreturn:\n{text}\n{"#"*120}")
     return(text)
 
 def assemble_query_prompt_to_fix_failing_unit_test():
     prompt= read_from_file(FIXING_PROMPT_TO_FIX_FAILING_INIT_PROMPT)
+
+    prompt += "\n\nThis ist the Unit-Test that was written and failed:\n"
+    prompt += read_from_file(FILENAME_OF_INIT_CREATED_UNIT_TEST) 
+    
+    prompt += "\n\nThis ist the Code that the unit-test was written for:\n"
+    prompt += read_from_file("created_scripts/example_solution.py")
+
+    prompt += "\n\nAnd that is the error message:\n"
+    prompt += read_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST) 
+
+    return prompt
+
+def assemble_query_prompt_to_delete_faulty_line_in_failing_unit_test():
+    prompt = read_from_file("prompts/remove_prompt.txt")
 
     prompt += "\nThis ist the Unit-Test that was written and failed:\n"
     prompt += read_from_file(FILENAME_OF_INIT_CREATED_UNIT_TEST) 
     
     prompt += "\nAnd that is the error message:\n"
     prompt += read_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST) 
-
-    return prompt
-
-def assemble_query_prompt_to_delete_faulty_line_in_failing_unit_test():
-    prompt = ""
-    prompt += "\nThis ist the Unit-Test that was written and failed:\n"
-    prompt += read_from_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST) 
     
-    prompt += "\nAnd that is the error message:\n"
-    prompt += read_from_file(LOGGING_OF_LAST_EXECUTED_UNIT_TEST) 
     
-    prompt += """Re-write this unit-test, without the line causing the error."""
 
     return prompt
     
@@ -168,7 +211,7 @@ def assemble_init_query_prompt(textual_instruction_prompt,index,incl_task_descr,
         if(elem[0] == "filename" and incl_filename):
             base_prompt += f"\nthe code is located in the file named:'{str(elem[1])}', so think of importing the file\n"
         if(elem[0] == "functionname" and incl_func_name):
-            base_prompt += f"\n-This is the functionname:\n{elem[1]}\n"
+            base_prompt += f"\n-This is the function name:\n{elem[1]}\n"
         if(elem[0] == "testexamples" and inc_test_examples):
             base_prompt += f"\n-These are the {len(elem[1])} testexamples:"
             for examples in elem[1]:
@@ -242,7 +285,12 @@ def unit_test_was_a_success_first_try():
         
 def instruct_model_to_fix_unit_test(model):
     print("FAIL! Created Unit test did fail, \nSending new prompt with error msg to gpt to generate new Unit-Test\n" if PRINT_VERBOSE else "",end='')
-    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(assemble_query_prompt_to_fix_failing_unit_test(),ROLE_CODER,model))
+    prompt_to_fix = assemble_query_prompt_to_fix_failing_unit_test()
+    #print(f"{"]o"*50+"Prompt to fix\n"}{prompt_to_fix}{"\n"+"]o"*50+"\n"}")
+    result_from_llm = send_prompt_to_model(prompt_to_fix,ROLE_CODER,model)
+    print(f"{"]o"*50+"fix from llm\n"}{result_from_llm}{"\n"+"]o"*50+"\n"}\n" if PRINT_VERBOSE else "",end='')
+    created_python_unit_test_by_llm = extract_code_from_prompt(result_from_llm)
+    print(f"{"]o"*50+"extracted code from fix\n"}{created_python_unit_test_by_llm}{"\n"+"]o"*50+"\n"}\n" if PRINT_VERBOSE else "",end='')
     write_to_file(FILENAME_OF_THE_FIXED_INIT_UNIT_TEST,created_python_unit_test_by_llm)
 
 def fixing_unit_test_did_not_work(model):
@@ -253,17 +301,18 @@ def fixing_unit_test_did_not_work(model):
     
 
 #exlude other tasks
-def execute_sequence_for_chart(model):
+def execute_transversal_for_chart(model):
     results = {}
     #Exluding tasks used for training
     list_of_indices = list(range(0,22))
     list_of_indices = [e for e in list_of_indices if e not in LIST_OF_TASKS_USED_FOR_VALIDATION]
-    #list_of_indices = [19,20,21]
-    pickle_in("logging/pickles/table_list.pik",{})
+    list_of_indices = [13, 14, 15, 17, 18, 19, 20, 21]
+    pickle_file_name = f"logging/pickles/table_{model}_{datetime.now().strftime("%H:%M:%S")}.pik"
+    pickle_in(pickle_file_name,{})
     print(f"List of tasks that get tested: {list_of_indices}")
     n_of_iterations = 4
     for which_task_index in list_of_indices:
-        print(f"Examination of task {which_task_index}")
+        print(f"\n{"#"*100}\nExamination of task {which_task_index}")
         task_dict={}
         results[str(which_task_index)]=task_dict
 
@@ -278,9 +327,9 @@ def execute_sequence_for_chart(model):
                 revise_instruction_prompt_by_llm = False
             if(elem == "generated_prompt"):
                 prompt = INIT_NAIVE_PROMPT_FOR_CREATING_A_UNIT_TEST
-                revise_instruction_prompt_by_llm = True            
-            print(f"\nPrompt: '{elem}'")
-            print("-Testing description only")
+                revise_instruction_prompt_by_llm = True
+            print(f"\n-prompt: {elem}")            
+            print("  -Testing description only")
             list_description_only = repetition_for_sequence( which_task_index,
                                                             revise_instruction_prompt_by_llm,
                                                             incl_task_descr=True,
@@ -291,7 +340,7 @@ def execute_sequence_for_chart(model):
                                                             n_of_iterations=n_of_iterations)
             prompt_dict["list_description_only"]=list_description_only
 
-            print("-Testing few shot without code")
+            print("  -Testing few shot without code")
             list_few_shot_without_code = repetition_for_sequence( which_task_index,
                                                             revise_instruction_prompt_by_llm,
                                                             incl_task_descr=True,
@@ -302,7 +351,7 @@ def execute_sequence_for_chart(model):
                                                             n_of_iterations=n_of_iterations)
             prompt_dict["list_few_shot_without_code"]=list_few_shot_without_code
 
-            print("-Testing zero shot with code")
+            print("  -Testing zero shot with code")
             list_zero_shot_with_code = repetition_for_sequence( which_task_index,
                                                             revise_instruction_prompt_by_llm,
                                                             incl_task_descr=True,
@@ -313,7 +362,7 @@ def execute_sequence_for_chart(model):
                                                             n_of_iterations=n_of_iterations)
             prompt_dict["list_zero_shot_with_code"]=list_zero_shot_with_code
 
-            print("-Testing few shot with code")
+            print("  -Testing few shot with code")
             list_few_shot_with_code = repetition_for_sequence( which_task_index,
                                                             revise_instruction_prompt_by_llm,
                                                             incl_task_descr=True,
@@ -324,9 +373,9 @@ def execute_sequence_for_chart(model):
                                                             n_of_iterations=n_of_iterations)
             prompt_dict["list_few_shot_with_code"]=list_few_shot_with_code
         print(results)
-        tmp_results = pickle_out("logging/pickles/table_list.pik")
+        tmp_results = pickle_out(pickle_file_name)
         tmp_results[str(which_task_index)]=task_dict
-        pickle_in("logging/pickles/table_list.pik",tmp_results)
+        pickle_in(pickle_file_name,tmp_results)
         print("Pickled data!")
     
 
@@ -343,20 +392,33 @@ def repetition_for_sequence(which_task_index,revise_instruction_prompt_by_llm,in
                                         prompt_for_init_generation=prompt,
                                         model=model)
         #dont count if code doesn't work
-        if(list_of_metrics[4] == False):
+        if(list_of_metrics[3] == False):
             n_of_failed_attempts += 1
+            if(n_of_failed_attempts >= 8):
+                print("    -Too many failed attempts")                
+                if(tmp_list == []):
+                    print(f"    returning: {[0,0,0,False,False,False,False,n_of_failed_attempts]}\n")
+                    return [0,0,0,False,False,False,False,n_of_failed_attempts]
+                list_of_averages = (np.mean(tmp_list, axis=0)).tolist()
+                list_of_averages.append(n_of_failed_attempts)
+                print(f"    returning: {list_of_averages}\n")
+                return list_of_averages
             print("    -Failed Attempt, not counting and retrying")
             continue
         i -= 1
-        print("    -Successful Attempt!")
+        print(f"    -Successful Attempt!:{list_of_metrics}")
+
         tmp_list.append(list_of_metrics)
     list_of_averages = (np.mean(tmp_list, axis=0)).tolist()
     list_of_averages.append(n_of_failed_attempts)
+    print(f"    returning: {list_of_averages}\n")
     return list_of_averages
 
 def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_by_llm,incl_task_descr,inc_test_examples,incl_code, prompt_for_init_generation,model):
-    did_first_code_generation_fail = False
     does_the_code_work_in_the_end = True
+    did_the_init_generation_work = False
+    did_fixing_the_code_work = False
+    did_removing_the_error_work = False
     code_cov, branch_cov, mutmut_score = 0,0,0
 
     if(revise_instruction_prompt_by_llm):
@@ -377,7 +439,10 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
                                                     inc_test_examples=inc_test_examples,
                                                     incl_code=incl_code)
     #send prompt
-    created_python_unit_test_by_llm = extract_code_from_prompt(send_prompt_to_model(prompt,ROLE_CODER,model))
+    result_from_llm = send_prompt_to_model(prompt,ROLE_CODER,model)
+    print(f"{"-."*50+"Result from LLM\n"}{result_from_llm}{"\n"+"-."*50+"\n\n\n"}\n" if PRINT_VERBOSE else "",end='')
+    created_python_unit_test_by_llm = extract_code_from_prompt(result_from_llm)
+    print(f"{"-."*50+"Code extracted\n"}{created_python_unit_test_by_llm}{"\n"+"-."*50+"\n"}\n" if PRINT_VERBOSE else "",end='')
     write_to_file(FILENAME_OF_INIT_CREATED_UNIT_TEST,created_python_unit_test_by_llm)
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
 
@@ -385,6 +450,7 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
     if(unit_test_bool):
         #Unit test was a success first try
         print("SUCCESS! Unit-test generation was a success first try\n" if PRINT_VERBOSE else "",end='')
+        did_the_init_generation_work = True
         code_cov, branch_cov, mutmut_score = run_test_suite("created_scripts/example_solution.py",FILENAME_OF_INIT_CREATED_UNIT_TEST)
     else:
 
@@ -396,6 +462,7 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
         #did the fixed unit test compile?
         if(unit_test_bool):
             print("Fixing the Unit-test was successfull\n" if PRINT_VERBOSE else "",end='')
+            did_fixing_the_code_work = True
             code_cov, branch_cov, mutmut_score = run_test_suite("created_scripts/example_solution.py",FILENAME_OF_THE_FIXED_INIT_UNIT_TEST)
         else:
             fixing_unit_test_did_not_work(model)
@@ -404,31 +471,30 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
                 print("Fixing the test did not work\n" if PRINT_VERBOSE else "",end='')
             else:
                 print("Fixing the test did work in the end!\n" if PRINT_VERBOSE else "",end='')
+                did_removing_the_error_work = True
                 run_test_suite("created_scripts/example_solution.py",FILENAME_OF_THE_DELETED_LINE_UNIT_TEST)
-                does_the_code_work_in_the_end = True
-            #fixing needs testing again
-        
-        #read out metrics
-    return [code_cov, branch_cov, mutmut_score,did_first_code_generation_fail, does_the_code_work_in_the_end]
+    
+    return [code_cov, branch_cov, mutmut_score, does_the_code_work_in_the_end, did_the_init_generation_work,did_fixing_the_code_work,did_removing_the_error_work]
 
 if __name__ == "__main__":
-    revise_instruction_prompt_by_llm = True
-    
+    revise_instruction_prompt_by_llm = False
     try:
         which_task_index = int(sys.argv[1])
     except:
-        which_task_index = 2
-    model = models.GPT35
-    PRINT_VERBOSE = True
-    list_of_metrics =execute_sequence_for_single_run(which_task_index=which_task_index,
+        which_task_index = 1
+    model = models.LLAMA8B
+    PRINT_VERBOSE = False
+    execute_transversal_for_chart(model.value)
+    
+    """list_of_metrics =execute_sequence_for_single_run(which_task_index=which_task_index,
                                     revise_instruction_prompt_by_llm=revise_instruction_prompt_by_llm,
                                     incl_task_descr=True,
                                     inc_test_examples=True,
                                     incl_code=True,
                                     prompt_for_init_generation=INIT_PROMPT_FOR_CREATING_A_UNIT_TEST,
-                                    model=model.value)
-    
+                                    model=model.value)#"""
     exit()
+    
     #print(does_the_unit_test_run_successfully("created_scripts/test-script-fixed.py"))
     
     list_of_metrics =execute_sequence_for_single_run(which_task_index=which_task_index,

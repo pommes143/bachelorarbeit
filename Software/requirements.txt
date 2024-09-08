@@ -1,7 +1,7 @@
 openai
 unittest2
 coverage==7.6.1
-mutmut==1.3.1
+mutmut==2.5.1
 importlib
 pytest
 radon
@@ -10,5 +10,6 @@ coverage-threshold
 aiohttp
 async
 numpy
-pickle
+pandas
+
 

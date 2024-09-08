@@ -1,6 +1,5 @@
 
 The things above are the parts of the description of a programming task.
-Now write me a Unit test with several simple but well thought-out asserts in python for to validate the code that was
-given above.
+Now write me a Unit test with several simple but well thought-out asserts in python for to validate the code of the task.
 Think of the imports.
 Be thourough.

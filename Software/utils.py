@@ -26,17 +26,30 @@ def pickle_out(filename):
     with open(filename, 'rb') as file:
         return pickle.load(file)
 
+#used to merge incomplete pickle data
+def merge_two_dicts(x, y):
+    z = x.copy()   
+    z.update(y)    
+    return z
+
 def extract_code_from_prompt(returned_string):
     blocks = returned_string.split('```')
+
     
-    # Check each block for the specific string
     for block in blocks:
         if "if __name__ ==" in block:
             if block.startswith('python'):
                 block = block[6:].strip()
                 #print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
             return set_syntax_and_imports_right_and_add_pragma(block)
-        
+    
+    for block in blocks:
+        if block.startswith('python'):
+            block = block[6:].strip()
+            block += "\nif __name__ == '__main__':"
+            return set_syntax_and_imports_right_and_add_pragma(block)
+                
+
     return set_syntax_and_imports_right_and_add_pragma(blocks[0])
 
     for block in blocks:

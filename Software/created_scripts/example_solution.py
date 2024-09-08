@@ -1,4 +1,8 @@
-#!function!#
-def contains_negative(numbers):
+#!print!#
+def what_are_you(something):
 #!prefix!#
-    return any(num < 0 for num in numbers)
+    #function body
+    print (type(something))
+    return type(something)
+    
+
