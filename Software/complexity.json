@@ -1,1 +1,1 @@
-{"created_scripts/example_solution.py": [{"type": "function", "rank": "A", "lineno": 2, "col_offset": 0, "complexity": 1, "name": "what_are_you", "endline": 6, "closures": []}]}
+{"created_scripts/example_solution.py": [{"type": "function", "rank": "A", "lineno": 2, "col_offset": 0, "name": "contains_negative", "endline": 4, "complexity": 2, "closures": []}]}

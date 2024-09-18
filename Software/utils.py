@@ -32,6 +32,11 @@ def merge_two_dicts(x, y):
     z.update(y)    
     return z
 
+def remove_key_from_dict(d, key):
+    r = dict(d)
+    del r[key]
+    return r
+
 def extract_code_from_prompt(returned_string):
     blocks = returned_string.split('```')
 

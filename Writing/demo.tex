@@ -54,35 +54,33 @@
 
 \chapter{Introduction}
 \label{Introduction}
-Unit-test are an important tool to ensure code functionality. But it is a a lot of work to write them, so the automatic generation of those tests arise as a possible solution.
-\\
-Large Language Models (LLMs) offer for the the possibility of creating useful unit-tests. But those generated test are flawed because those LLMs dont work with reason, but instead the statistically most probable answer.
-\\
-Prior work  has tried under different circumstances to solve this problem.[paper 1,2,3].
-\\
+Unit-test are an important and useful tool to ensure code functionality. But it is a a lot of work to write them, so the automatic generation of those tests arise as a possible solution. \\\\
+Large language models (LLMs) are getting more competent in the generation of code and therefore present themselves as a possible solution to this problem, even though they still are not completely reliable.
+Prior work  has tried under different circumstances to solve this problem.\\\\
+I use the groundwork of Schaefer et al.\cite{Schaefer_automated_unit_test_generation}, which used chat gpt-3.5 turbo to automatically generate unit-tests, and expand their approach and measure the results.\\\\
 My goal in this work is to:
-\begin{center}
-    \item generate these unit-tests with different LLMs
-    \item generate these unit-tests with different prompt design strategies
-    \item measure the code coverage and statement coverage of generated unit-test
-\end{center}
-and then at the end i want to compare the different approaches.
-
+\begin{itemize}
+    \item define the necessity and problems of automatic unit-test generation
+    \item present the approach of Schafer et al.
+    \item explain my differing implementation and the additions i made
+    \item illustrate the data i gathered
+    \item and interpret the results and come to a conclusion and outline future work
+\end{itemize}
 
 \chapter{Background}
 \label{Background}
 In this chapter i will describe the theoretical basis and key-words of my work to later structurally, highlight the adjacent academic work. The implementation of these concepts, and which libraries and frameworks i selected in my work are elaborated below in "Methods"\ref{Methods}.
 \section{LLMs}
 Large Language Models(LLMs) are computational models that normally used an enormous data set for learning and are able to achieve general-purpose language generation and other tasks like categorization and other multi-modal tasks. An LLM is only as good as its architecture and its training data. 
-In the case of unit-tests
-Generating unit-tests for mainstream code might be sufficient. But it is really easy to write code which covers niche subjects. And in those cases the LLM would need critical thinking, understanding and reasoning to fully understand the code and write useful and encompassing unit-tests.
-\subsection{GPT}
-ChatGPT is an advanced conversational AI model developed by OpenAI. It works by using a large language model trained on diverse internet text to generate human-like responses to user inputs. The architectual structure of the model is based on transformers which assign varying weights to input data based on the context.
+In the case of unit-tests multiple, different skills and knowledge domains are necessary to write a function unit-test of good quality.
 
-In this work i made use of the version 3.5 and 4o.
-\subsection{llama 3.1}
-Llama is LLM which weights are freely available under a licence that permits some amount of commercial use. It was developed by Meta(formally Facebook).
+\subsubsection{Chat-GPT}
+Chat-GPT is an advanced conversational AI model developed by OpenAI. It works by using a large language model trained on diverse internet text to generate human-like responses to user inputs. The architectural structure of the model is based on transformers which assign varying weights to input data based on the context.
+The older, less capable chat-gpt 3.5 turbo and the newest, more developed chat-gpt 4o are used in this work. 
 
+\subsubsection{Llama 3.1}
+Llama is a LLM which weights are freely available under a licence that permits some amount of commercial use and was developed by Meta(formally Facebook).
+Two variations are relevant to this work, llama 3.1 with 7 billion parameters (llama3.1 7b) and llama 3.1 with 80 billion parameters (llama3.1 80b.)
 
 \section{Prompt-engineering}
 Prompt engineering describes the systematic design and optimization of input prompts to achieve the best possible result in the use of chatbots like chat-GPT, BARD or Claude. Prompt engineering is a major lever towards better results \cite{Citation needed} and can also be used to overcome challenges like hallucinations \cite{sato2024reducingHallucination}.
@@ -91,8 +89,8 @@ It has also been shown that the fine-tuning of prompts is a easy technique that 
 Through the evolution of that discipline alongside chatbots, new techniques have appeared. From simple approaches like being clear and precise and using the phrase "let's think step by step" over few-shot prompting to different versions of chain-of-thought prompting methods\cite{chen2024promptengineering}. 
 
 \subsection{Role-prompting}
-Role-prompting is a prompt which instructs the role and tasks of the LLM on a broader and is not a query. Role-prompting has been shown to have a meaningful impact in the optimization of prompts \cite{kong2024promptRoleplayEffective}.
-
+Role-prompting is a prompt which describes the role and the expected outcome of the LLM on a broader scale and is not a query.
+Role-prompting has been shown to have a meaningful impact in the optimization of prompts \cite{kong2024promptRoleplayEffective}.
 
 \section{Unit-tests}
 Unit-tests are software tests written to guarantee that the implemented functionalities of functions or other units of code. Unit testing is an important factor in software development. But creating those unit tests by hand is a elaborate and time-consuming task\cite{Daka_unit_tests} \cite{UnitTestAdequacy}. So with the rise of popular LLMs like Open AIs GPT-3 \cite{brown2020languagemodelsfewshotlearners}, Googles BARD and Anthropic’s Claude2, the automatic generation of those software tests arise as a possible optimization to the bounded, regular generation of unit-tests that use static or dynamic analysis techniques to optimize the statement coverage\cite{OverviewUnitTestGeneration2013}. 
@@ -102,19 +100,19 @@ Unit-tests are software tests written to guarantee that the implemented function
 Metrics are the techniques used in the attempt to evaluate the quality of unit-test. Meaning, how capable the unit-test is in catching errors.
 
 The metrics of unit-tests have become more important with the rise of industrial software unit-tests. The main metrics used are code/statement coverage, branch-coverage, path-coverage and the mutation-score \cite{UnitTestAdequacy}.
-I used statement-coverage, branch-coverage and the mutation score to evaluate my results.
+In this work, statement-coverage, branch-coverage and the mutation score are used to evaluate the results.
 \\
-Metrics are a way to quantify the capabilities of a unit-test. But as with all tests, they can't cover every possible test case. 
+Metrics are a part of quantifying the capabilities of a unit-test. But as with all tests, they can't cover every possible test case. 
 
 \epigraph{Program testing can be used to show the presence of bugs, but never to show their absence!}{Dijkstra } 
 
 Metrics combined with experience and an understanding of the environment are the best way to create high-quality unit-tests and ensure aptitude\cite{citation needed}.
 
 \subsection{Statement coverage}
-Statement coverage, also called code coverage, is a well-known metric that measures the lines that were executed during a unit-test. Higher code coverage can loosely be used to indicate a better the quality of the application.\cite{taufiqurrahmanCodeCoverage}. In this work i am going to exclusively use the term statement coverage. 
+Statement coverage, also called code coverage, is a well-known metric that measures the lines that were executed during a unit-test. Higher statement coverage can loosely be used to indicate a better the quality of the application.\cite{taufiqurrahmanCodeCoverage}. In this work i am going to exclusively use the term statement coverage. 
 
 \subsection{Branch coverage}
-Branch coverage detects junctions where the code could jump one line and measures which branches are tried out in testing. The score can be falsified by edge-cases like a \textit{while(true)} loop or branches which purposefully should never be accessed.
+Branch coverage detects junctions where the code could jump one line and measures which branches are used in testing. The score can be falsified by edge-cases like a \textit{while(true)} loop or branches which purposefully should never be accessed.
 The example below shows this possible grey zone.
 The \textit{while True} loop breaks if a condition is met. But because that gets decided outside the \textit{while}, and the condition \textit{True} never changes to \textit{False}, this gets a branch coverage score of 0.5 although the code works as intended.
 
@@ -126,36 +124,23 @@ while True:
 \end{verbatim}
 
 \subsection{Mutation score}
-The mutation score tries to expand the package of metrics used for unit-tests by artificially inserting errors in the original code. Those artificial, purposefully faulty versions of the original code are called \textit{mutations}. The expectation is that the test suite catches those errors, and if they don't, it should be a cue to correct the tests.\\
-Those mutations are isomorphic to each other. For instance changing a operator, number, relational operator or boolean, or changing an assignment to \textit{None}\\
-The selection of which operators are to be mutated are depended of the respective framework that is used. Most frameworks allow a selection of the mutations. However, generating and testing mutations can be computationally and time expensive depending on the thoroughness that is being used in the mutating.
-
+The mutation score tries to expand the package of metrics used for unit-tests by artificially inserting errors in the original code. Those artificial, purposefully faulty versions of the original code are called \textit{mutations}. The expectation is that the test suite catches those errors, and if they don't, it should be a cue to correct the tests.Those mutations are isomorphic to each other. For instance changing a operator, number, relational operator or boolean, or changing an assignment to \textit{None}. The selection of which operators are to be mutated are depended of the respective framework that is used. Most frameworks allow a selection of the mutations. However, generating and testing mutations can be computationally and time expensive depending on the thoroughness that is being used in the mutating.
 A further issue is that sometimes some numbers and operators may not be affecting the capabilities of the code, but express an aspect of the implementation but are still flagged as an error.
-
 That means that the mutation score as well is not the be-all and end-all of metrics and needs to be used with consideration for the surviving mutants and the surroundings. It is possible to mute lines of code by adding a "\# pragma: no mutate" at the end of the line but that is bothersome in larger projects and not always applicable.
+
 \subsection{Cyclomatic code complexity}
 Cyclomatic complexity is a software metric that measures the number of linearly independent paths through a program's source code. It works by analyzing the control flow graph of a program, counting decision points like if statements and loops. A higher cyclomatic complexity indicates more complex code. 
-
-I only use cyclomatic code complexity as a method to fine tune my prompt, and not as a metric for the generated unit-tests.
+Cyclomatic code complexity in the context of this work, is only used as a method to fine tune the prompt, and not as a metric for the generated unit-tests.
 
 \chapter{Related work}
 \label{RelatedWork}
-Paper with non LLM-Versions of unit-test generation
-other attempts of unit test generation with LLMs and their approaches
-Main paper which this work concentrates on
-    Their approach, data set, metric
-    compared to mine
-    their results
-    brief overview how i am different 
-
 After all concepts and keywords are explained, i will explore what techniques exist for generating unit-tests with and without the help of an LLM. 
-\section{Non-LLM Generation}
-//non LLM generation techniques
 
+\section{Non-LLM Generation}
 
 
 \section{Generation with LLMs}
-The process to automatically generate unit-tests was already approached by several academic papers\cite{tufanoTestCaseGeneration} \cite{yang2024empiricalstudyunittest}, but the previous work with the most influence on my approach is Schaefer et al.\cite{Schaefer_automated_unit_test_generation}
+The process to automatically generate unit-tests was already approached by several academic papers\cite{tufanoTestCaseGeneration} \cite{yang2024empiricalstudyunittest}, but the previous work with the most influence on my approach is Schaefer et al. \cite{Schaefer_automated_unit_test_generation}
 Schaefer et al. created a javascript library using chat-gpt 3.5 turbo to automatically generate unit-tests for 1684 API functions distributed over 25 freely available npm packages. The core of their approach is that their prompt contains context information. And if the querey fails, another one is send with the error message as additional information. \\Their prompt has the following structure:
 \begin{enumerate}
     \item function signature
@@ -164,49 +149,18 @@ Schaefer et al. created a javascript library using chat-gpt 3.5 turbo to automat
     \item the source code
     \item the error message, if that is the second try
 \end{enumerate}
-
-My approach is build upon Schaefer et al. but extends their approach by:
+\\\\My approach is build upon Schaefer et al. but extends their approach by:
 \begin{itemize}
-    \item extend the failure correction by another step where the llm is instructed not to fix, but to simply remove the part of the code that causes the error.
-    \item measuring the importance of the different informations that are incorporated by the prompt  
-    \item measuring the difference between chat-GPT 3.5 turbo, chat-GPT 4o, and two open source LLMs  
+    \item extending the failure correction by another step where the llm is instructed not to fix, but to simply remove the part of the code that causes the error.
+    \item measuring the relevance of the different informations that are incorporated by the prompt. 
+    \item measuring the difference between chat-GPT 3.5 turbo, chat-GPT 4o, llama3.1 7b and llama3.1 80b.  
     \item extending the naive prompt and refined prompt by a prompt that is refined by the same model that generates the unit-test.
 \end{itemize}
-
-I use a different baseline because their prompting strategy was not appilcable in my case.
-The prompt structure of Schaefer et al. is an incomplete test function that implies the need to complete said function. In my attempts of this strategy this led to very unreliable results. I suspect that the syntax difference of java-script and python might be the reason. The missing brackets in javascript a explicitly imply the missing content. But the same structure in python is a valid empty husk that doesen't imply missing features.
-
+A different baseline was used in this project because their prompting strategy was not applicable. The baseline prompt structure of Schaefer et al. is an incomplete test function that implies the need to complete said function. In my attempts of this strategy this led to very unreliable results. I suspect that the syntax difference of java-script and python might be the reason. The missing brackets in javascript explicitly imply the missing content. But the same structure in python is a valid empty husk that doesen't carry the same implication.
 
 \chapter{Methods}
 \label{Methods}
 In this section i present my implementation of the concepts introduced in "Background and related work" and extend those by other aspects of my work.
-
-\section{Data and pre-processing}
-I received 22 tasks as data for my eventual evaulation, which are tasks used in a university course "introduction to python". These task form the basis of my validation and testing of the automatic generation of unit-tests. Each task has its own folder with a task description, an example solution of the code and an accompanying unit-test with some asserts. Tasks $0,2,4,6,7,8,16 and 6$ were used in my validation of the "hyper-parameters" like selection of the refined prompt, code extraction and general performance optimization. 
-Tasks $1,3,5,9,10,11,12,13, 14, 15, 17, 18, 19, 20 and 21$ were only used for the production of the experiments.
-
-Because those tasks come from an introductory course for python, they all are 	comparatively easy exercises. But they were pretty inconsistent considering the quality of the description and sometimes the code needed to be adjusted.
-Furthermore some tasks which were created to illustrate basic python principles had code which was hard to convey semantically, for more details see \ref{Challanges:Data}.
-
-\begin{wrapfigure}[22]{r}{5.5cm}
-    \includegraphics[scale=0.4]{Process-Sequence2.drawio.png}
-    \caption{Process Sequence}
-    \label{fig:process-sequence}
-\end{wrapfigure}
-
-To use those tasks programmatically i created a "prompt" file which combined all the information's about the task in one file. The taskdescription, filename, functionname and textexamples of the respective tasks could then be easily parsed. 
-
-\section{Project flow}
-
-Here i roughly describe the flow of information in my project. 
-Graph \ref{fig:process-sequence} is an overview of the steps taken to get to a result. Further below figure \ref{fig:all_prompts} shows the composition of the different prompts. 
-
-The main sequence is that a prompt is send to an LLM model and code or written test cases are returned. 
-The terms to describe the prompts \textit{Initial Prompt},\textit{Fixing prompt} and \textit{Remove prompt} are used reliably throughout this work to describe the prompts and stages of the process, outlined in \ref{fig:process-sequence}.
-
-The returned written test cases are then used to complement a new prompt and the returned code is then evaluated. The first step in the evaluation is testing if the returned code is executable code. If so, its performance is getting checked by the test suite considering statement coverage, branch coverage and mutation score.  
-
-The following sections explain in deeper detail the specific steps.
 
 \section{LLMs}
 Large Language Models (LLMs) are the core component of this work, that interpret and then return generated code through prompts.
@@ -214,6 +168,34 @@ They have comparable capabilities and , GPT-4o and llama3.1 with 70 billion para
 
 I used chat-gpt(GPT) 3.5, GPT 4o, llama3.1 with 8 billion parameters and llama3.1 with 70 billion parameters. 
 GPT was used because of its accessibility and prominence and to be able to compare it to other models, i also included llama. For all of these i used an API endpoint to send my prompts to and in the case of the open source models i used an endpoint provided to me by my co-examiner Jesper Dannath.
+
+\section{Data and pre-processing}
+I received 22 tasks as data for the eventual evaluation, which are tasks used in a university course "introduction to python". 
+These task form the basis of my validation and the testing of the automatic generation of unit-tests. 
+Each task has its own folder with a task description, an example solution of the code and an accompanying unit-test with some asserts. Tasks $0,2,4,6,7,8,16 \text{ and } 6$ (36\%) were used in my validation of the "hyper-parameters" like selection of the refined prompt, code extraction and general performance optimization. 
+Tasks $1,3,5,9,10,11,12,13, 14, 15, 17, 18, 19, 20 \text{ and } 21$(63\%) were only used for the production of the experiments.
+
+Because those tasks come from an introductory course for python, they all are 	comparatively easy exercises. But they were pretty inconsistent considering the quality of the description and sometimes the code needed to be adjusted.
+Furthermore some tasks which were created to illustrate basic python principles had code which was hard to convey semantically, for more details see \ref{Challanges:Data}.
+
+To use those tasks programmatically i created a "prompt" file which combined all the information's about the task in one file. The taskdescription, filename, functionname and textexamples of the respective tasks could then be easily parsed. 
+
+\section{Project flow}
+
+Here i roughly describe the flow of information in my project. 
+Graph \ref{fig:process-sequence} is an overview of the steps taken to get to a result. Further below figure \ref{fig:all_prompts} shows the composition of the different prompts. 
+\begin{wrapfigure}[22]{r}{5.5cm}
+    \includegraphics[scale=0.4]{Process-Sequence2.drawio.png}
+    \caption{Process Sequence}
+    \label{fig:process-sequence}
+\end{wrapfigure}
+
+The main sequence is that a prompt is send to an LLM model and text is returned. 
+The terms to describe the prompts are: \textit{Initial Prompt},\textit{Fixing prompt} and \textit{Remove prompt}, which are used reliably throughout this work to describe the prompts and stages of the process, outlined in \ref{fig:process-sequence}.
+
+The returned written test cases are then used to complement a new prompt and the returned code is then evaluated. The first step in the evaluation is testing if the returned code is executable code. If so, its performance is getting checked by the test suite considering statement coverage, branch coverage and mutation score.  
+
+The following sections explain in deeper detail the specific steps.
 
 \section{Prompt-design}
 \begin{figure}
@@ -223,7 +205,7 @@ GPT was used because of its accessibility and prominence and to be able to compa
     \label{fig:all_prompts}
 \end{figure}
 
-Prompts are ,in the context of this work, query's in text form for the respective LLM and consist of different information's that can be included at will.
+Prompts are ,in the context of this work, query's in text form for the respective LLM that consist of different information's that can be included at will.
 
 \subsubsection{Textual instructions}
 Textual instructions are part of every prompt and are instructions in pure text form that formulate the desired result.
@@ -235,18 +217,18 @@ The generated instruction uses the naive instruction as a basis and appends a li
 Three main prompts are used to request unit-tests as pictured in \ref{fig:process-sequence}. Supporting those tasks are the role prompts.
 
 \subsubsection{Init Prompt}
-The init prompt contains the modular contents \textit{description}, \textit{functionname} and \textit{code}. Those are the information's which are later used in the experiments\ref{Experiments} and are read out from the "prompt" file in the task folders.
-
+The init prompt contains the modular contents \textit{description}, \textit{functionname} and \textit{code}. Those are the information's which are later used in the experiments\ref{Experiments}, are read out from the "prompt" file in the task folders and can be included at will.
+The textual instruction is then one of the three, above mentioned possible instructions. Then comes the textual instruction which requests a fitting unit-test, and in the case of the
 At the end a single line demands the least amount of asserts. The cyclomatic complexity of the code is used as an indicator how many asserts get demanded. 
 
 \subsubsection{Fixing Prompt}
 When the init prompt doesn't result in a compiling unit-test a new prompt is sent to the LLM to fix the error in the existing unit-test. For that the contextual informations of the unit-test, original code and the resulting error are included. 
 
 \subsubsection{Removing Prompt}
-If the original error still persists, a last try is made by removing the lines causing the malfunction of the unit-test. Often the remaining lines still lead to a unit-test with good metrics.
+If the original error still persists, a last try is made by removing the lines causing the malfunction of the unit-test. 
 
 \subsection{Role Prompts}
-Role prompts are used in this work in an effort to control the output format of the LLM. The validation phase was completed with GPT 3.5 turbo, where the role prompts had a high effect. The llama models on the other hand seemed to use the role prompts more as a suggestion than a framework. That lead to a reduced success rate which is explained in more detail bewlo \ref{Experiments}.
+Role prompts are used in this work in an effort to control the output format of the LLM. The validation phase was completed with GPT 3.5 turbo, where the role prompts had a high effect. The llama models on the other hand seemed to use the role prompts more as a suggestion than a strict framework. That lead to a reduced success rate which is explained in more detail below \ref{Experiments}.
 
 Two role prompts are used, a \textit{coder role} and a \textit{writer role}. The coder role prompt uses intensive language to urge the LLM to only output code without any accompanying text. The writer role prompt does the exact opposite and demands only written text.
 
@@ -256,63 +238,40 @@ The coder role is utilized in the generation of unit tests and the writer role i
 Extracting the useful code from the return string is essential to generate usable code and has a large impact regarding the performance. For example 
 
 \text
-That is done through two functions in \textit{utils.py}. The first detects the block of code. And the second takes that block of code and adjusts import statements if necessary and adds a "\textit{\text{\# pragma: no cover}}" to exclude \textit{\text{if \_\_name\_\_ == "\_\_main\_\_":}} from the statement coverage evaluation because the \textit{if} counts as branch.   
+That is done through two functions in the \textit{utils.py} file, \textit{extract\_code\_from\_prompt()} and \textit{set\_syntax\_and\_imports\_right\_and\_add\_pragma()}. The first detects the block of code. And the second takes that block of code and adjusts import statements if necessary and adds a "\textit{\text{\# pragma: no cover}}" to exclude \textit{\text{if \_\_name\_\_ == "\_\_main\_\_":}} from the statement coverage evaluation because the \textit{if} counts as branch.   
 
-My implementation of the post-processing is lacking because there are several edge cases which are not accountant for. For example if the LLM sends the code in two parts, those parts are not connected and only one block of incomplete code is going to lead to an incorrect unit-test.
+The random nature of the responses from the LLM leads to a restricted capability of the post-processing efforts to extract the correct code. The responses do not follow the desired format in all cases. Sometimes that code is split up, or completely replaced by an instruction in pure text on how to do it.
+That 
 
 \section{Evaluation through test suite}
-If testing the generated code with pytest results in a return value of 0, that generated unit-test counts as valid and is then being run through the test suite.
+The extracted code is then validated with pytest which returns a value of 0 if the unit-test either fails or doesen't even compile as python code. If the return value is 1 that means that the unit-test is a valid python file and all the tests succeeded and are ready to be evaluated by the different metrics.
 
 \subsection{Statement coverage and branch coverage}
-The python package \textit{coverage} is used to measure statement coverage and branch coverage.
+The python package \textit{coverage} is used to measure statement coverage and branch coverage.The final statement coverage is the percentage of lines of the original code that are being executed in the unit-test.
 
-The final statement coverage is the percentage of line of the original code that are being executed in the unit-test.
 Branch coverage checks all if all the possible branches in junctions are being tested by the unit-test with the issues mentioned in the background section \ref{Background}.
 
 \subsection{Mutation coverage}
-\textit{Mutmut} is used as the mutation score evaluation tool with no special options used. This package works exactly as outlined in the backgrounds section \ref{Background}. But in detail it differentiates the mutation results into four categories. \textit{Killed} mutants which is the desired state of detecting mutations in the code. The second category is \textit{timeout}, which means that an induced mutation lead to an execution time 10 times higher than the mutmut baseline and counts as killed. \textit{Suspicious} means that the testing took a long time but not long enough to be flagged as timeout. The last category is \textit{survived} which means that an induced mutation did not change the outcome of the unit-test. 
+\textit{Mutmut} is used as the mutation score evaluation tool with no special options used. This package works exactly as outlined in the backgrounds section \ref{Background}. But in detail it differentiates the mutation results into four categories. \textit{Killed} mutants are the desired state of mutations in the code and means they were identified as errors by the unit-test. The second category is \textit{timeout}, which means that an induced mutation lead to an execution time 10 times higher than the mutmut baseline and counts as killed. \textit{Suspicious} means that the testing took a long time but not long enough to be flagged as timeout. The last category is \textit{survived} which means that an induced mutation did not change the outcome of the unit-test. 
 
-In this project only the \textit{killed} mutations are counted as success. Based upon the simplicity of the data set, few cases of \textit{timeout} or \textit{suspicious} emerge.
+In this project only the \textit{killed} and \textit{survived} mutations are used in the evaluation. Based upon the simplicity of the data set, few cases of \textit{timeout} or \textit{suspicious} emerge.
 
-\section{Challenges}
-\subsubsection{LLM usage}
-I included the llama3.1 model too late and therefore had more time invested in the adaptation to the chat-GPT models and part of llamas worse performance may well be insufficient adjustment. Further i overfit my validation case by mostly validating with the \textit{few-shot with code}-case.
 
-Another problem with llama3.1 is that it responded quite bad to the role prompting and i could not find a replacement parameter with which i could exercise enough control over the output. That is important because role-prompting is a big part of controlling the correct output that is extractable. 
-For example the llama model had a tendency to respond with less code and more textual assistance on how to write the code instead of writing it. That made it impossible to instruct valid code out of it and therefore lead to worse capabilities in the experiments \ref{Experiments}.
-
-\subsubsection{Data}
-\label{Challanges:Data}
-
-The data varied fairly much in quality and some tasks needed manual repairs to make them usable, others were excluded. 
-
-For instance task 2, "breakfast",  is the exercise to append some substrings to a given parameter string. That task is not demanding, but it is convoluted and if the LLM has the assignment to create a unit-test for that task without seeing the actual code, it ultimately is only guessing how the source code looks like. That results in high error rates, whereas if the code is included, the test generation succeeds quite easily.
-
-The problem is far less present in tasks where the code leaves less room for interpretation.
-
-Additionally worth mentioning is task number 8 in which the task is to write a function that greets a parameter name and then greets Alice and Bob. That easy task proved to be quite a challange in the validation phase.
-
-\subsubsection{Prompt design}
-
-I tried to implement the base line of Schaefer et al.\cite{Schaefer_automated_unit_test_generation}, but that failed to generate any kind of usable results. Schaefer et al. used the incomplete upper half of a javascript, testing function with additional informations included above the function header. 
-
-I suspect that that approach failed in my implementation because a python function header lacks brackets that clearly indicates. 
 
 \chapter{Experiments}
 \label{Experiments}
-
-The core aspect of this work is the generation and interpretation of the gained data. This chapter explains how the testing was done and the chapter below \ref{Discussion} interprets that data. The tables with the data are found at \ref{table:gpt35}\ref{table:gpt4o}\ref{table:resultsLLama7b}.
+A goal of this work, besides creating a usable application, is the generation and interpretation of data. This chapter explains how the testing was done and the chapter below \ref{Discussion} interprets that data. The tables with the data are found at \ref{table:gpt35}\ref{table:gpt4o}\ref{table:resultsLLama7b}.
 
 I used the method explained in the chapter "methods"\ref{Methods}, and implemented it in on a bigger scale, in a structured way to then make statements about the the performance of the LLMs, the prompts and the necessity of the information's needed to generate a unit-test.
 
 \section{Test setup}
 \label{testSetup}
-The smallest unit is the \textit{single run}. In that, one cycle of unit-test generation is carried out for a certain LLM model, selected task from the data set and with particular selection of prompt information's, as outlined in figure \ref{fig:process-sequence}.
-That single run results in working code or not. A single run that doesn't result in working code is referenced as \textit{faulty run}, if it results in successful code it is a \textit{successful run}. 
+The smallest unit in the testing is the \textit{single run}. In that, one cycle of unit-test generation is carried out for a certain LLM model, selected task from the data set and with particular selection of prompt information's, as outlined in figure \ref{fig:process-sequence}.
+That single run results in working code or not and return a list with results in either case. A single run that doesn't result in working code is referenced as \textit{faulty run} and if it results in successful code it is a \textit{successful run}. 
 Important to note is that a successful run can still be a bad generated unit-test because some way the return from the LLM was faulty or the correct extraction of code did not work.  
 
 \begin{verbatim}
-Return from successful run:
+Return list from successful run:
 [1.0, 1.0, 1.0, True, True, False, False]
 \end{verbatim}\\
 \begin{verbatim}
@@ -323,12 +282,11 @@ Still a successful run:
 
 In either case the single run returns the statement coverage, branch coverage, mutation coverage, a boolean if the code works in the end and three flags, if the code worked the first time or got repaired or the faulty line got removed.
 
-That \textit{single run} is then encapsulated in a \textit{repetition}. 
-That repetition aims for 4 successful runs, if a run is faulty it just tries again. After 4 successful runs or 8 faulty runs, the repetition return the average of the so far executed successful runs. That limit of 8 faulty runs is necessary because else some parameter combinations would result in an endless loop.
+That \textit{single run} is then encapsulated in a \textit{repetition}. That repetition aims for 4 successful runs and if a run is faulty it just tries again. After 4 successful runs or 8 faulty runs, the repetition returns the average of the so far executed successful runs. That limit of 8 faulty runs is necessary because else some parameter and task combinations result in an endless loop.
 
-That \textit{repetition} is then further encapsulated in a \textit{transversal} which systematically tests the spectrum of parameter possibilities to generate the data. It tests over all 22 tasks, and each task gets tested for three different prompt methods \ref{fig:experiment-setup}.
+That \textit{repetition} is then further encapsulated in a \textit{transversal} which systematically tests the spectrum of parameter possibilities for one model, to generate the data. A \textit{transveral} tests each possible combination of tasks(22x), prompts(3x) and information compositions(4x), and  a repetition repeats(4x min) a single run(1x)\ref{fig:experiment-setup}.
 
-This results in a minimum amount of $22*3*4=264$ single runs. Each single run has one to three api calls for the normal prompt, and two to four api calls for the refined prompt. 
+This results in a minimum amount of $22*3*4*4=1056$ single runs. Each single run has one to three api calls for the normal prompt, and two to four api calls for the refined prompt. 
 
 \begin{figure}
     \centering
@@ -337,10 +295,16 @@ This results in a minimum amount of $22*3*4=264$ single runs. Each single run ha
     \label{fig:experiment-setup}
 \end{figure}
 
-1\section{Explaining the data}
-Each table \ref{table:gpt35}\ref{table:gpt4o}\ref{table:resultsLLama7b} represents the data for one model. Each model was tested with the three prompt strategies explained above \ref{fig:all_prompts}, and each prompt was tested with four different compositions of information. 
-The first category \textit{only task-description}, is the prompt only containing the task description and each following category also contains the task description.
+For each model those results are then put into big tables \ref{table:gpt35} \ref{table:gpt4o} \ref{table:resultsLLama7b} which display the results.  
 
+\subsection{Compositions}
+Compositions are the sub-categories of the prompts and are are different combinations of the informations the can be put into a prompt, see \ref{fig:all_prompts}.  
+The first category \textit{only task-description}, is the prompt only containing the task description and ist the basis on which further compositions are build upon.
+\textit{Few shot without code} contains the task description and examples of possible asserts.
+\textit{Zero shot with code} also contains the task description but adds the source code for which the LLM should build the unit-test.
+The last composition \textit{few shot with code} then combines all possible information's together, the task description, the example asserts and the source code. 
+
+When all is put into a table it looks like this:
 
 \begin{table}[!ht]
     \centering
@@ -349,7 +313,7 @@ The first category \textit{only task-description}, is the prompt only containing
     \hline
         GPT-3.5 turbo (model) & ~ & ~ \\ \hline
         Naive Prompt (prompt): & ~ & ~ \\ \hline
-        Only Task-description (category): & ~ & ~ \\ \hline
+        Only Task-description (composition): & ~ & ~ \\ \hline
         ~ & Stmnt. Cov (metric): & 0.616 \\ \hline
         ~ & Branch Cov: & 0.603 \\ \hline
         ~ & Mutation Score: & 0.769 \\ \hline
@@ -361,11 +325,14 @@ The first category \textit{only task-description}, is the prompt only containing
     \caption{Section of data which illustrates the table structure}
 \end{table}
 
-\textit{Few-shot without code} includes few-shot examples from the available example asserts and \textit{zero-shot with code} only adds the source code to the task description. The last category contains all information's available for the task.
+Each combination of model, prompt and composition is then measured for the different metrics.
 
-Each composition of information is then measured for statement coverage, branch coverage and the mutation score(\ref{metricsForEvaluationOfUnitTest}). The three following metrics \textit{\"\% of success...\"} describe the percentage of unit-tests that were successfully created in the first try, where fixing lead to a working result and where removing the error causing line lead to success. Following the fixing efforts outlines in the process sequence\ref{fig:process-sequence}.
+A single run returns the statement coverage, branch coverage and the mutation score(\ref{metricsForEvaluationOfUnitTest}). The three following metrics \textit{\"\% of success...\"} describe the percentage of unit-tests that were successfully created in the first try, where fixing lead to a working result and where removing the error causing line lead to success. 
 
-The last metric is the average number of faulty runs produced in a \textit{repetition}\ref{testSetup}, with a maximum of 8 possible faulty runs in a repetition. This has some	accompanying expressiveness over how the LLM model is struggling with the available information's. 
+A repetition then returns the average of all successful runs and appends the number of faulty runs, with a maximum of 8 possible faulty runs in a repetition before the repetition returns prematurely.
+
+\section{Caution}
+Sometimes there are strange numbers in the table like 0.0 or 1.0 where there shouldn't be or coincidences like same numbers. Errors in the testing setup can't be excluded, but in the end this is not an immense amount of points in the data per column. Maybe its also because of the success distribution. In tasks where it succeeded it mostly succeeded with perfect scores. But if it failed, it  often failed with 0\% in all metrics. Additionally the source code of some tasks have very few lines of source code and therefore produce distinct numbers in the metrics.
 
 \section{Baseline}
 As my baseline is use chat-GPT 3.5 turbo with the \textit{naive prompt} containing only the \textit{task description}. That Baseline is not directly comparable to Schaefer et al.\cite{Schaefer_automated_unit_test_generation} but it represents the intuitive, naive attempt with little effort that compares well to improved efforts. 
@@ -373,42 +340,114 @@ As my baseline is use chat-GPT 3.5 turbo with the \textit{naive prompt} containi
 \chapter{Discussion}
 Here i interpret the results of the experiments and add meaning and statement to the numbers.
 \label{Discussion}
-\section{Assumptions}
+\section{Assumptions and results}
 
 My assumptions was that the chat-gpt 4o mode with the refined prompt, containing all the possible information's, would perform best.
-<insert findings about data>
 
-easy statements first, 4o better than 3.5
-best and worst categories
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+        Ranked compound metrics of model & ~ & ~ \\ \hline
+        gpt35-turbo &  refined\_prompt & 0.8287 \\ \hline
+        llama3.1-8b &  generated\_prompt & 0.7888 \\ \hline
+        gpt35-turbo &  generated\_prompt & 0.7797 \\ \hline
+        llama3.1-8b &  naive\_prompt & 0.743 \\ \hline
+        gpt4o &  refined\_prompt & 0.722 \\ \hline
+        gpt4o &  naive\_prompt & 0.7112 \\ \hline
+        gpt35-turbo &  naive\_prompt & 0.6548 \\ \hline
+        gpt4o &  generated\_prompt & 0.6424 \\ \hline
+        llama3.1-8b &  refined\_prompt & 0.5859 \\ \hline
+    \end{tabular}
+    \caption{Ranked list of models per compounded metric}
+\end{table}
+
+But that showed itself to be false. That table is a compound of statement coverage, branch coverage and mutation score. The 4o model is located in the lower third of that list. That is really surprising until we differentiate between the different metrics.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+        Statement Coverage Results & ~ & ~ \\ \hline
+        gpt4o &  naive\_prompt & 0.8296 \\ \hline
+        gpt4o &  refined\_prompt & 0.8189 \\ \hline
+        gpt35-turbo &  refined\_prompt & 0.8173 \\ \hline
+        llama3.1-8b &  generated\_prompt & 0.7904 \\ \hline
+        llama3.1-8b &  naive\_prompt & 0.7548 \\ \hline
+        gpt4o &  generated\_prompt & 0.7022 \\ \hline
+        gpt35-turbo &  generated\_prompt & 0.6697 \\ \hline
+        llama3.1-8b &  refined\_prompt & 0.5967 \\ \hline
+        gpt35-turbo &  naive\_prompt & 0.5828 \\ \hline
+    \end{tabular}
+    \caption{Ranked list of statement coverage}
+\end{table}
+
+In the ranked lists for statement coverage and branch coverage, chat-gpt 4o has the best performance as expected. It becomes apparent that 4o mainly has a really bad mutation score.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+        Mutation Score Results & ~ & ~ \\ \hline
+        gpt35-turbo &  generated\_prompt & 0.9292 \\ \hline
+        gpt35-turbo &  refined\_prompt & 0.8583 \\ \hline
+        llama3.1-8b &  generated\_prompt & 0.7931 \\ \hline
+        gpt35-turbo &  naive\_prompt & 0.759 \\ \hline
+        llama3.1-8b &  naive\_prompt & 0.7232 \\ \hline
+        llama3.1-8b &  refined\_prompt & 0.5667 \\ \hline
+        gpt4o &  refined\_prompt & 0.5306 \\ \hline
+        gpt4o &  generated\_prompt & 0.5256 \\ \hline
+        gpt4o &  naive\_prompt & 0.496 \\ \hline
+    \end{tabular}
+    \caption{Ranked list of mutation score}
+\end{table}
+
+It is not evident why 4o had such a bad performance concerning it's mutation score. It may well be that the 4o model wrote more complicated tests which had a higher tendency to fail the mutation testing and the other models wrote simpler tests which got better mutation scores. But as discussed at the beginning \ref{Background} a better statement or branch coverage only has limited say about the quality of a unit-test.
 
 \section{models}
-compare models
-    add stmnt, branch and mut together and the prompts, and max is best
-    llama had far more errors generated
-    llama profitet most from the generated prompts
+Chat-gpt 3.5 turbo performed the best overall, and more specifically the refined prompt. On the one hand it shows that a refined prompt design is an efficient lever to control the output quality of LLMs, on the other hand this was probably also a result of the overfitting of the validation that had a big impact on the performance.
 
-3.5 turbo was strong in success first try" across all prompts
-    was maybe because the validation occured on that set
+Chat-gpt 4o was the best model concerning statement and branch coverage, but struggled heavily with the mutation score. That may well be because of the above mentioned reasons. 4o otherwise had the lowest amount of failed attempts, meaning that it produced results more reliable.
 
-4o better mutation score across all prompts
-    maybe better at writing more robust test cases
+LLama3.1 with 7 billion parameters did also pretty well overall and had it's best score with the generated prompt. But it was the worst in the average number of failed attempts. That is probably an indication of the worse code extraction which is a result of the lower effect of the role prompt on the llama LLM.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|}
+    \hline
+        Number of average failed attempts & ~ \\ \hline
+        ~ & ~ \\ \hline
+        gpt35-turbo & ~ \\ \hline
+          naive\_prompt & 1.87 \\ \hline
+          refined\_prompt & 1.4 \\ \hline
+          generated\_prompt & 1.37 \\ \hline
+        ~ & ~ \\ \hline
+        gpt4o & ~ \\ \hline
+          naive\_prompt & 0.72 \\ \hline
+          refined\_prompt & 0.9 \\ \hline
+          generated\_prompt & 1.03 \\ \hline
+        ~ & ~ \\ \hline
+        llama3.1-8b & ~ \\ \hline
+          naive\_prompt & 2.47 \\ \hline
+          refined\_prompt & 4.02 \\ \hline
+          generated\_prompt & 3.85 \\ \hline
+    \end{tabular}
+    \caption{Average number of failed attempts per model}
+\end{table}
 
 
-llama less failures with better prompts
+\section{Prompts}
 
-\section{prompts}
-calculate average difference in model when prompt is changed 
-prompts have an effect!
-main question, did the prompts change something
+The overfitting of my validation case showed that homing in on a good prompt has a effect over the results.
 
-measure how different performance of models is with different prompt designs
-    4o is pretty stable all across
+Concerning the data, the refined prompt seems to have led to big improvements for the gpt-3.5 model and small improvements for the gpt-4o model. Llama3.1 with 8 billion parameters(llama 8b) did far worse with a refined prompt.
 
-did the generation of the prompt help
-    did the generation of prompt lead to better scores in harder tasks?
-    
-\section{categories}
-few shot generally performs better than no shot attempts
+The generated prompt was a help for the smaller models gpt-3.5 and llama 8b, but an impediment for the more advanced 4o model.
+
+\section{Compositions}
+A visible in the the table \ref{table:compound_per_composition} \textit{"no-shot with code"} and \textit{"few-shot with code"} performed generally better than the first two compositions. It seems that providing exemplary asserts did not help without the source code as context.
+
+Gpt-4o is more concentrated and robust with it's performance.
 
 \section{metrics}
 fixing the code seems to have been hard
@@ -422,27 +461,39 @@ amount of errors is a statement about sure the LLM was?!
 \section{tasks}
 
 which where the hardest tasks
-
-
-\section{caution}
-there are sometimes strange numbers in the table like 0.0 or 1.0 where there shouldn't be or coincidences like same numbers. I cant exclude errors on my part, but in the end this is not an immense amount of points in the data per column. Maybe its also because of the success distribution. In tasks where it succeded it mostly succeded with perfect scores. But if it failed, it most often failed with 0\% on all fronts.
-
-
-
-
-
 reference main question of the ba
 reference results with results from neighbouring papers
 
 \chapter{Conclusion}
-recap aim,procedure and results and use the findings of the discussion to come to a final statement considering the ba question and relate to other papers
-\section{Hypothesis and main question}
+
+\section{Challenges}
+\subsubsection{LLM usage}
+I overfit my validation case by mostly validating with the \textit{few-shot with code}-case with gpt-3.5 turbo and considering the llama models too late in the validation. Part of llamas worse performance may well be insufficient adjustment.
+
+Another problem with llama3.1 is that it responded quite bad to the role prompting and i could not find a replacement parameter with which i could exercise enough control over the output. That is important because role-prompting is a big part of controlling the correct output and how well the code is extractable. 
+For example the llama model had a tendency to respond with less code and more textual assistance on how to write the code instead of writing it. That made it much harder to extract valid code out of its responses and therefore lead to worse capabilities in the experiments \ref{Experiments}.
+
+\subsubsection{Data}
+\label{Challanges:Data}
+
+The data varied fairly much in quality and some tasks needed manual repairs to make them usable, others were excluded. 
+
+For instance task number two, "breakfast", is the exercise to append some substrings to a given parameter string. That task is not demanding, but it is convoluted and if the LLM has the assignment to create a unit-test for that task without seeing the actual code, it ultimately is only guessing how the source code looks like. That results in high error rates, whereas if the code is included, the test generation succeeds quite easily.
+The problem is far less present in tasks where the code leaves less room for interpretation.
+
+Additionally worth mentioning is task number 8 in which the task is to write a function that greets a parameter name and then greets Alice and Bob. That easy task proved to be quite a challange in the validation phase. Maybe because such a simple task was overanalyzed, either way it proved to be quite the struggle.
+
+\subsubsection{Prompt design}
+I tried to implement the base line of Schaefer et al.\cite{Schaefer_automated_unit_test_generation}, but that failed to generate any kind of usable results. Schaefer et al. used the incomplete upper half of a javascript, testing function with additional informations included in the docstring above the function header. 
+
+It may be that that attempts failed because a python function header lacks brackets that clearly indicates missing content. 
+
 \label{Conclusion}
-re-telling of the paper
-high-level overview of experimental results
-Limitations
-what future work could accomplish
-final words
+To summarize, i used the groundwork of Schaefer et al.\cite{Schaefer_automated_unit_test_generation} to develop an own approach to unit-test generation and measured the capabilities of that approach on a big scale. I used a variety of different metrics and informations to measure the performance and weight of the different aspects of unit-test generation.\\\\
+Considering the edge-cases of code extraction, in which code-extraction of pure text is attempted and leads to compiling unit-tests which have 0\% in all metrics. The generation of unit-tests is feasible and can lead to acceptable results but can't run completely autonomous and regularly needs human intervention.\\\\
+The particular fine-tuning of the prompt with respect to the particular model leads to an increase in test coverage. Additionally the amount of information needs to be fine-tuned to the model and the task, as to not overwhelm the model with information and lead to a worse performance.\\\\
+The mutation score showed itself as a valuable additional metric. But it can't be used on it's own to assert the unit-test quality as seen in the poor performance of the mutation scores of gpt-4o.\\\\
+A insufficiency of this work lies in the unstructured and unreliable returns from the LLMs. Future work that improves the code extraction or has access to more consistent returns, could probably improve the unit-test quality.  
 		
 \newpage
 			
@@ -592,13 +643,58 @@ For words of science, see \cite{botsch2010polygon}. Unfortunately, that book has
         ~ & Avrg n of falliures: & 1.800 & ~ & ~ & Avrg n of falliures: & 2.933 & ~ & ~ & Avrg n of falliures: & 3.667 \\ \hline
     \end{tabular}}
 \end{table}
-
 \newpage
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+        Ranking composition compunded: & ~ & ~ & ~ \\ \hline
+        gpt35-turbo &  refined\_prompt &  No-shot, with code & 0.8961 \\ \hline
+        gpt35-turbo &  refined\_prompt &  Few-shot, with code & 0.8645 \\ \hline
+        llama3.1-8b &  generated\_prompt &  Few-shot, with code & 0.8234 \\ \hline
+        llama3.1-8b &  naive\_prompt &  Few-shot, with code & 0.8158 \\ \hline
+        llama3.1-8b &  naive\_prompt &  Few-shot, no code & 0.8108 \\ \hline
+        llama3.1-8b &  generated\_prompt &  No-shot, with code & 0.8103 \\ \hline
+        gpt35-turbo &  generated\_prompt &  only description & 0.8038 \\ \hline
+        gpt4o &  naive\_prompt &  No-shot, with code & 0.8 \\ \hline
+        gpt35-turbo &  refined\_prompt &  only description & 0.7949 \\ \hline
+        gpt4o &  refined\_prompt &  No-shot, with code & 0.7944 \\ \hline
+        gpt35-turbo &  generated\_prompt &  Few-shot, with code & 0.7865 \\ \hline
+        llama3.1-8b &  generated\_prompt &  only description & 0.7806 \\ \hline
+        gpt4o &  refined\_prompt &  Few-shot, with code & 0.7778 \\ \hline
+        gpt35-turbo &  generated\_prompt &  No-shot, with code & 0.7656 \\ \hline
+        gpt35-turbo &  generated\_prompt &  Few-shot, no code & 0.7629 \\ \hline
+        gpt35-turbo &  refined\_prompt &  Few-shot, no code & 0.7591 \\ \hline
+        llama3.1-8b &  refined\_prompt &  Few-shot, with code & 0.7411 \\ \hline
+        llama3.1-8b &  generated\_prompt &  Few-shot, no code & 0.741 \\ \hline
+        llama3.1-8b &  naive\_prompt &  No-shot, with code & 0.7251 \\ \hline
+        gpt35-turbo &  naive\_prompt &  No-shot, with code & 0.7189 \\ \hline
+        gpt4o &  refined\_prompt &  Few-shot, no code & 0.7127 \\ \hline
+        gpt4o &  generated\_prompt &  Few-shot, with code & 0.7115 \\ \hline
+        gpt4o &  generated\_prompt &  No-shot, with code & 0.7032 \\ \hline
+        gpt4o &  naive\_prompt &  Few-shot, no code & 0.7023 \\ \hline
+        gpt4o &  naive\_prompt &  Few-shot, with code & 0.6981 \\ \hline
+        gpt35-turbo &  naive\_prompt &  Few-shot, no code & 0.6564 \\ \hline
+        gpt35-turbo &  naive\_prompt &  only description & 0.6456 \\ \hline
+        gpt4o &  naive\_prompt &  only description & 0.6445 \\ \hline
+        gpt4o &  generated\_prompt &  only description & 0.628 \\ \hline
+        llama3.1-8b &  naive\_prompt &  only description & 0.6205 \\ \hline
+        llama3.1-8b &  refined\_prompt &  Few-shot, no code & 0.6167 \\ \hline
+        gpt4o &  refined\_prompt &  only description & 0.6032 \\ \hline
+        gpt35-turbo &  naive\_prompt &  Few-shot, with code & 0.5983 \\ \hline
+        llama3.1-8b &  refined\_prompt &  No-shot, with code & 0.5611 \\ \hline
+        gpt4o &  generated\_prompt &  Few-shot, no code & 0.5268 \\ \hline
+        llama3.1-8b &  refined\_prompt &  only description & 0.4246 \\ \hline
+    \end{tabular}
+    \label{table:compound_per_composition}
+    \caption{Compound performance per composition}
+\end{table}
 \backmatter
 \printglossaries
 \printbibliography[heading=bibintoc]
 \noindent\fbox{\begin{minipage}{\textwidth}
-\-This is the task-description:\\
+\-These are latex capabilities from the demo:\\
 Create a function that checks if a given list of numbers contains any negative numbers. The function should return True if there are negative numbers and False otherwise. (**HINT** you can use "any()" to check the list)
 \\\\
 the code is located in the file named:'example\_solution.py', so think of importing the file \\\\

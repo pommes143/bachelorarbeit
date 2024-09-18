@@ -64,7 +64,13 @@ overview of your experimental results and how they support that your
 method is amazing
 * Limitations: what do the results **not** show (yet); what can
 your method **not** do?
-* Future work: what could be resolved in subsequent
+* Future work: what could be resolved in subs y).
+* Also add some context/discussion to explain surprising results
+(Surprisingly, we found x. This can likely be explained by the fact that
+...); only use the word "significantly" if you really did a significance
+test
+* If you did a user study, describe that in a separate section with
+its own little method section (where you describe yourequent
 experiments/extensions of the method?
 * Some final sentence to round it off
 
