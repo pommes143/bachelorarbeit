@@ -91,7 +91,8 @@ def run_test_suite(code_filename,test_filename):
     if(code_cov >1.0):
         code_cov = code_cov/100
     print(f"mutmut score: {mutmut_score}\n" if PRINT_VERBOSE else "",end='')
-    print(f"{"#"*80}\n" if PRINT_VERBOSE else "",end='')
+    subprocess.call(f"mutmut show", shell = True, executable="/bin/sh")
+    print(f"{"#?"*80}\n" if PRINT_VERBOSE else "",end='')
     return code_cov, branch_cov, mutmut_score
 
 def get_code_complexity(code_filename):
@@ -473,9 +474,9 @@ def execute_sequence_for_single_run(which_task_index,revise_instruction_prompt_b
                                                     incl_code=incl_code)
     #send prompt
     result_from_llm = send_prompt_to_model(prompt,ROLE_CODER,model)
-    print(f"{"-."*50+"Result from LLM\n"}{result_from_llm}{"\n"+"-."*50+"\n\n\n"}\n" if PRINT_VERBOSE else "",end='')
+    #print(f"{"-."*50+"Result from LLM\n"}{result_from_llm}{"\n"+"-."*50+"\n\n\n"}\n" if PRINT_VERBOSE else "",end='')
     created_python_unit_test_by_llm = extract_code_from_prompt(result_from_llm)
-    print(f"{"-."*50+"Code extracted\n"}{created_python_unit_test_by_llm}{"\n"+"-."*50+"\n"}\n" if PRINT_VERBOSE else "",end='')
+    #print(f"{"-."*50+"Code extracted\n"}{created_python_unit_test_by_llm}{"\n"+"-."*50+"\n"}\n" if PRINT_VERBOSE else "",end='')
     write_to_file(FILENAME_OF_INIT_CREATED_UNIT_TEST,created_python_unit_test_by_llm)
     unit_test_bool = does_the_unit_test_run_successfully(FILENAME_OF_INIT_CREATED_UNIT_TEST)
 
@@ -514,8 +515,8 @@ if __name__ == "__main__":
     try:
         which_task_index = int(sys.argv[1])
     except:
-        which_task_index = 2
-    model = models.GPT4
+        which_task_index = 16
+    model = models.GPT35
     PRINT_VERBOSE = True
     #execute_transversal_for_chart(model.value)
     
