@@ -1,0 +1,11 @@
+#taskdescription
+Define a function, that returns the square of a real input number.
+Use the folowing signature:
+#filename
+example_solution.py
+#functionname
+square(x)
+#testexamples
+assert square(3) == 9, "Square of 3 is 9"
+
+assert square(0) == 0, "Square of 0 is 0"

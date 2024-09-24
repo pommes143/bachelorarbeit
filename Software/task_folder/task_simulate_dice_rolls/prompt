@@ -1,0 +1,18 @@
+#taskdescription
+Simulate rolling a fair six-sided die and calculate the average value of multiple rolls. Include the random seed, so that the behaviour could be replicated, if necessary. 
+#filename
+example_solution.py
+#functionname
+simulate_dice_rolls(num_rolls, random_seed)
+#testexamples
+num_rolls0 = 1
+random_seed0 = 4
+average_value0 = simulate_dice_rolls(num_rolls0, random_seed0)
+expected_average0 = 3.0
+assert average_value0 == expected_average0, "It seems you did not use np.randint() to simulate the dice roll."
+
+num_rolls1 = 1000
+random_seed1 = 42
+average_value1 = simulate_dice_rolls(num_rolls1, random_seed1)
+expected_average1 = 3.5
+assert np.isclose(average_value1, expected_average1, atol=0.1), "It seems, that the average you found is too far from expected 3.5. While it might be an outlier, it is worth it to double-check the code. "

@@ -1,0 +1,22 @@
+#taskdescription
+Create a Python function that takes a 1D NumPy array as input. The function should reshape the 1D array into a 2D matrix with a specified number of rows and columns. After reshaping, calculate and return the row sums and column sums of the resulting matrix. in case if the array cannot be converted to the matrix of the requested shape, return None. 
+#filename
+example_solution.py
+#functionname
+reshape_and_sum(input_array, num_rows, num_columns)
+#testexamples
+input_array1 = np.array([1, 2, 3, 4, 5, 6])
+num_rows1 = 2
+num_columns1 = 3
+row_sums1, column_sums1 = reshape_and_sum(input_array1, num_rows1, num_columns1)
+expected_row_sums1 = np.array([6, 15])
+expected_column_sums1 = np.array([5, 7, 9])
+assert np.array_equal(row_sums1, expected_row_sums1), "The row sums are not calculated correctly."
+
+input_array1 = np.array([1, 2, 3, 4, 5, 6])
+num_rows1 = 2
+num_columns1 = 3
+row_sums1, column_sums1 = reshape_and_sum(input_array1, num_rows1, num_columns1)
+expected_row_sums1 = np.array([6, 15])
+expected_column_sums1 = np.array([5, 7, 9])
+assert np.array_equal(column_sums1, expected_column_sums1), "The column sums are not calculated correctly."

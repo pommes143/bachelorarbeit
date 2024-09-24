@@ -1,0 +1,8 @@
+#taskdescription
+The command **type()** can help you determine the type of the variable in question. Write a function  **what_are_you** that will be printing out the type of input (please do not forget to use the **print()**). The output is not a string, but a data type
+#filename
+example_solution.py
+#functionname
+what_are_you(something)
+#testexamples
+assert submission_captured_output == "<class 'str'>\n<class 'int'>\n<class 'float'>\n<class 'bool'>", "You forgot to test out your function. Or maybe, the order of your output is wrong?"

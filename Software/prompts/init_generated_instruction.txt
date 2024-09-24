@@ -1,0 +1,5 @@
+
+The things above are the parts of the description of a programming task.
+List a thourough list of cases which should be tested in a unit test.
+Let's think step by step.
+

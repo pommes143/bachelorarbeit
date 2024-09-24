@@ -1,0 +1,10 @@
+#taskdescription
+Define a function, that will create and return a new list, containing the first and the last value of the input list.
+#filename
+example_solution.py
+#functionname
+shorten(my_list)
+#testexamples
+assert shorten([0,1,2,3,4,5,6,7]) == [0, 7], "It seems that some elements are not there or have a wrong format.*(Tuples are not lists!)"
+
+assert shorten(['eggs', 'fruit', 'orange juice', "ham"]) == ['eggs', "ham"], "Are you sure there are the first and the last elements only?"

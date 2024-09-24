@@ -1,0 +1,23 @@
+#taskdescription
+Create a function that generates an identity matrix of a specified size, where all diagonal elements are set to a specific value other than 1.
+The arrays do not have to be one dimensional. Rather, and array (you can also see ndarray in Numpy context) refers to an array of a deliberate dimensionality. A popular option for this are matrices: two-dimensional arrays.
+If the matrix cannot be created (negative n), return None. 
+#filename
+example_solution.py
+#functionname
+custom_identity_matrix(n, value)
+#testexamples
+n = 3
+custom_value = 2
+result = custom_identity_matrix(n, custom_value)
+expected_result = np.array([[2, 0, 0], [0, 2, 0], [0, 0, 2]])
+assert np.array_equal(result, expected_result), "Test case 1 (3x3 matrix, value 2) failed"
+
+n = 2
+custom_value = 5
+result = custom_identity_matrix(n, custom_value)
+expected_result = np.array([[5, 0], [0, 5]])
+assert np.array_equal(result, expected_result), "Test case 2 (2x2 matrix, value 5) failed"
+
+
+

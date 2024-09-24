@@ -1,0 +1,18 @@
+#taskdescription
+A NumPy mask array is a Boolean array used to filter or select specific elements from another array. This powerful tool facilitates data manipulation by enabling the extraction of data based on specific conditions.
+Create a function that takes a NumPy array and a mask array as inputs. The function should return a new array containing elements from the original array that correspond to False values in the mask array. (**HINT** it can be useful to invert the input mask for this). Please return None if the mask does not math the array.
+#filename
+example_solution.py
+#functionname
+apply_mask(input_array, mask)
+#testexamples
+original_array = np.array([1, 2, 3, 4, 5])
+mask = np.array([True, False, True, False, True])
+result = apply_mask(original_array, mask)
+expected_result = np.array([2, 4])
+assert np.array_equal(result, expected_result), "There is something wrong with the main function. Did you invert the mask?"
+
+original_array = np.array([1, 2, 3, 4, 5])
+mask = np.array([True, False, True])
+result = apply_mask(original_array, mask)
+assert result is None, "The case for the mismatch in sizes of the array and the mask is not accounted for."

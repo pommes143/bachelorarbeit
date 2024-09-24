@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.6, pytest-8.3.3, pluggy-1.5.0
+rootdir: /home/rpommes/1Zentrum/Uni/24SoSe/Bachelorarbeit/1Project/Software
+plugins: anyio-4.4.0
+collected 3 items
+
+created_scripts/created_unit_test.py ...                                 [100%]
+
+============================== 3 passed in 0.03s ===============================

@@ -1,0 +1,10 @@
+#taskdescription
+Write a function that takes a list as an input, and creates a new list with first and last elements of the original list removed (original list should be preserved). Return both the new list and the old list. 
+#filename
+example_solution.py
+#functionname
+list_copy(my_list)
+#testexamples
+assert list_copy([1, 2, 3, 4, 5])[0] == [2, 3, 4], "There is an error in creating the new list"
+
+assert list_copy([1, 2, 3, 4, 5])[1] == [1, 2, 3, 4, 5], "The original list is not preserved"

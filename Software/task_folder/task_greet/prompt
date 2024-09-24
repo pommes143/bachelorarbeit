@@ -1,0 +1,8 @@
+#taskdescription
+Write a function named greet that prints "Hello {name}" where name is taken as the function parameter and then prints "Hello Alice" and "Hello Bob" afterwards
+#filename
+example_solution.py
+#functionname
+greet(name)
+#testexamples
+assert submission_captured_output == "Hello Alice\nHello Bob", "You forgot to greet Alice and Bob on the console."

@@ -1,0 +1,15 @@
+#taskdescription
+Create a function that for an input array of angles (in degrees) returns sin, cos, and tan for each element.  
+#filename
+example_solution.py
+#functionname
+trigonometry(angle_array)
+#testexamples
+angle_array1 = np.array([0, 30, 45, 60])
+sine_values1, cosine_values1, tangent_values1 = trigonometry(angle_array1)
+expected_sine1 = np.array([0.0, 0.5, np.sqrt(2)/2, np.sqrt(3)/2])
+assert np.allclose(sine_values1, expected_sine1), "Sinus (positive) values are calculated not correctly."
+
+sine_values2, cosine_values2, tangent_values2 = trigonometry(angle_array2)
+expected_sine2 = np.array([-np.sqrt(3)/2, -np.sqrt(2)/2, -0.5, 0.0])
+assert np.allclose(sine_values2, expected_sine2), "Sinus (negative angle) values are calculated not correctly."

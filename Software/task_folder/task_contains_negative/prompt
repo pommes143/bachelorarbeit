@@ -1,0 +1,10 @@
+#taskdescription
+Create a function that checks if a given list of numbers contains any negative numbers. The function should return True if there are negative numbers and False otherwise. (**HINT** you can use "any()" to check the list)
+#filename
+example_solution.py
+#functionname
+contains_negative(numbers)
+#testexamples
+assert contains_negative([1, 2, 3, 4, 5]) == False, "There is no negative numbers in [1, 2, 3, 4, 5]"
+
+assert contains_negative([1, 2, -3, 4, 5]) == True, "There is a negative numbers in [1, 2, -3, 4, 5]"

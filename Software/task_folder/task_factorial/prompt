@@ -1,0 +1,13 @@
+#taskdescription
+Write a function of a factorial: the product of all positive interegers less or equal to a given positive integer: 
+$$n! := \prod_{i=1}^n i$$
+Note, that ther factorial is not defined for negative numbers. 
+#filename
+example_solution.py
+#functionname
+factorial(n
+#testexamples
+assert factorial(0) == 1, "Factorial of 0 is 1"
+assert factorial(1) == 1, "Factorial of 1 is 1"
+assert factorial(5) == 120, "Factorial of 5 is 120"
+assert factorial(10) == 3628800, "Factorial of 10 is 3628800"

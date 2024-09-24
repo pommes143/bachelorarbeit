@@ -1,0 +1,35 @@
+#taskdescription
+As an input ("sentence") you will be receiving a string with products, like: "ham, fruit, orange juice". 
+Within your function: 
+1. Translate the string into a list of products (**hint**: split the string by comma with **split()** function)
+2. Append an irreplacable product ("coffee") at the end to the breakfast list with .append()
+3. Extend the list to accomodate people who prefer leftovers from the previous evening ["pizza", "noodles"] with .extend()
+4. Find out the length of the product list you have created. 
+5. Create a new list with the first 2 products from the list you have created. 
+6. Find out the lengths of the products in the new list and calculate their sum ((**hint**: you can use a loop for this)). 
+7. Add "coffee" to the beginning of the new list with .insert()
+For the input in the example above, the following output is expected: 
+
+```
+6, 8, ["coffee", "ham", "fruit"] 
+```
+#filename
+example_solution.py
+#functionname
+def breakfast(sentence):
+#testexamples
+sentence1 = "ham, fruit, juice"
+result1 = breakfast(sentence1)
+assert result1[0] == 6,  "It seems that the length of the list is not calcualted properly."
+assert result1[2] == ['coffee', 'ham', 'fruit'],  "1. It seems that the new list is not created properly."
+assert result1[1] == 8, "It seems that the sum of lengths of products is not correct." 
+assert result1[2][0] == 'coffee', "Coffee always comes first!"
+
+sentence2 = "cereal, milk, yogurt"
+result2 = breakfast(sentence2)
+assert result2[0] == 6,  "It seems that the length of the list is not calcualted properly."
+assert result2[2] == ["coffee", "cereal", "milk"],  "2. It seems that the new list is not created properly."
+assert result2[1] == 10,  "It seems that the sum of lengths of products is not correct."
+
+
+

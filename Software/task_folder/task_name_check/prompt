@@ -1,0 +1,16 @@
+#taskdescription
+Create a function in the following format: 
+def name_check(my_name):
+For the name given, this function should: 
+1. Create a tuple containing the letters of your name from a string.
+2. Check whether or not x is in the name. ()
+3. Create tuple containing all but the first letter in `my_name`
+**Note:** You can check whether something is included in a tuple (or list) by using the keyword "in", e.g: (var in tuple)
+#filename
+example_solution.py
+#functionname
+name_check(my_name)
+#testexamples
+assert name_check("Robert")[0] == False, "The first output should be False, if there is no x in the name"
+
+assert name_check("Xena")[0] == True, "The first output for Xena should be True, as there is an x in the name. Did you account for upper case X?"

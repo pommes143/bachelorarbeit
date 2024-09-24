@@ -1,0 +1,13 @@
+#taskdescription
+For an input list of numbers, please define a following function: 
+def second_sum(input):
+Which outputs the sum of every second number of the list. 
+(**Hint** you can also check the length of a list with len(my_list))
+#filename
+example_solution.py
+#functionname
+second_sum(input)
+#testexamples
+assert second_sum([1, 2, 3, 4, 5]) == 6, "It seems that the sum was calculated wrong"
+
+assert second_sum([9, 10, 16, 8, 0,7,5,3,2]) == 28, "It seems that the sum was calculated wrong"

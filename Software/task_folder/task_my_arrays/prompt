@@ -1,0 +1,26 @@
+#taskdescription
+Write a function, that will be producing following returns based on the input integer *n*:
+1. Create an array of zeros of the size *n*.
+2. Create an array of ones of the size *n*.
+3. Create an array of fives of the size *n*.
+4. Return None for negative **n**.
+
+(**HINT** np.zeros(), np.ones() can be quite useful here)
+**Note** This pre-alpha version can only use primitive python types as argumrnts for "run". Please provide the arguments as list and transform them in your function body via np.array().
+#filename
+example_solution.py
+#functionname
+my_arrays(n)
+#testexamples
+n1 = 5
+zeros_array1, ones_array1, fives_array1 = my_arrays(n1)
+expected_zeros1 = np.zeros(n1)
+expected_ones1 = np.ones(n1)
+expected_fives1 = np.full(n1, 5)
+assert np.array_equal(zeros_array1, expected_zeros1), "Error in creation of the array of zeros"
+
+zeros_array1, ones_array1, fives_array1 = my_arrays(n1)
+expected_zeros1 = np.zeros(n1)
+expected_ones1 = np.ones(n1)
+expected_fives1 = np.full(n1, 5)
+assert np.array_equal(ones_array1, expected_ones1), "Error in creation of the array of ones"

@@ -1,0 +1,13 @@
+#taskdescription
+Create a function that finds the largest perfect square (a number that is a square of an integer) in a list of numbers and returns it. If no perfect square is found, the function should return None. 
+You can implement this task with the following function using the **math.isqrt()** function from the **math** package to check if a number is a perfect square, but feel free to explore other options!
+#filename
+example_solution.py
+#functionname
+largest_perfect_square(numbers)
+#testexamples
+numbers1 = [1, 4, 9, 16, 25]
+assert largest_perfect_square(numbers1) == 25, "It seems that the largest sqaure is not found correctly."
+
+numbers2 = [8, 10, 15, 18, 20]
+assert largest_perfect_square(numbers2) == None, "It seems that the case for None is not implemented."

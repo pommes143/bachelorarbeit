@@ -1,0 +1,12 @@
+#taskdescription
+Write a function, that for each integer *n* will be returning 3 new values: as string, integer, and float.
+#filename
+example_solution.py
+#functionname
+variables(n)
+#testexamples
+assert variables(0)[0] == str(0), "The first output should be string"
+
+assert variables(0)[1] == int(0), "The second output should be integer"
+
+assert variables(0)[2] == float(0), "The third output should be float"

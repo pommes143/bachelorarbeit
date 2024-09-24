@@ -1,0 +1,13 @@
+#taskdescription
+Create a function that finds the smallest positive number greater than a specified threshold in a list of numbers and returns it. If no such number is found, the function should return None.
+#filename
+example_solution.py
+#functionname
+smallest_positive(numbers, threshold)
+#testexamples
+numbers1 = [1, 2, 3, 4, 5]
+threshold = 2
+assert smallest_positive(numbers1, threshold) == 3, "It seems that the smallest number above the threshold if found wrong. Do you use a strict difference?"
+
+numbers2 = [-2, -1, 0, 5, 7, 2, -4]
+assert smallest_positive(numbers2, threshold) == 5, "It seems that the smallest number above the threshold if found wrong. Do you use a strict difference?"

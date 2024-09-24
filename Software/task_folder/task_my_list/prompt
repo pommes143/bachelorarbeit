@@ -1,0 +1,8 @@
+#taskdescription
+Create a function, that for each integer **n** will create an arbitrary list with **n** elements: 
+#filename
+example_solution.py
+#functionname
+my_list(n)
+#testexamples
+assert len(my_list(7)) == 7, "It seems that the number of created elements is not correct"
