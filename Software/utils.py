@@ -38,62 +38,24 @@ def remove_key_from_dict(d, key):
     return r
 
 def extract_code_from_prompt(returned_string):
+    """used to extract the code from the string which is returned by the LLM"""
     blocks = returned_string.split('```')
-
-    
     for block in blocks:
         if "if __name__ ==" in block:
             if block.startswith('python'):
                 block = block[6:].strip()
                 #print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
             return set_syntax_and_imports_right_and_add_pragma(block)
-    
     for block in blocks:
         if block.startswith('python'):
             block = block[6:].strip()
             block += "\nif __name__ == '__main__':"
             return set_syntax_and_imports_right_and_add_pragma(block)
-                
-
     return set_syntax_and_imports_right_and_add_pragma(blocks[0])
 
-    for block in blocks:
-        if block.startswith('python'):
-            block = block[6:].strip()
-            if("if __name__ ==" in block):
-                    #print(f"{"-"*50+"\n"}printed block:\n{block}{"\n"+"-"*50+"\n"}")
-                return set_syntax_and_imports_right_and_add_pragma(block)
-            else:
-                block += ("if __name__ == '__main__':\n")
-                return set_syntax_and_imports_right_and_add_pragma(block)
-    
-        
-    return set_syntax_and_imports_right_and_add_pragma(blocks[0])
-    start = '```'
-    end = '```'
-    code_blocks = []
-    
-    # Find all code blocks
-    start_indices = [i for i in range(len(returned_string)) if returned_string.startswith(start, i)]
-    end_indices = [i for i in range(len(returned_string)) if returned_string.startswith(end, i)]
-    if len(start_indices) != len(end_indices):
-        return None  # Mismatched code block delimiters
-    
-    # Extract code blocks
-    for s, e in zip(start_indices, end_indices):
-        block = returned_string[s+len(start):e].strip()
-        if block.startswith('python'):
-            block = block[6:].strip()  # Remove 'python' from the start
-        code_blocks.append(block)
-    
-    # Find the block with "if __name__ == '__main__':"
-    main_block = next((block for block in code_blocks if "if __name__ == '__main__':" in block), None)
-    
-    return (main_block)
-
-
-#remove everything below "if __name__ == '__main__':" and replace with "unittest.main()"
 def set_syntax_and_imports_right_and_add_pragma(string):
+    """When the code is found, check that it has the right imports 
+    and add a #pragma: no cover, to exclude the if from the branch coverage evaluation"""
     lines = string.split('\n')
     output_lines = []
     replace_block = False
@@ -127,6 +89,7 @@ def set_syntax_and_imports_right_and_add_pragma(string):
     return '\n'.join(output_lines)
 
 def process_folders(main_folder):
+    """Reads out all the prompt files of all task folders"""
     result = []
     for subfolder in os.listdir(main_folder):
         subfolder_path = os.path.join(main_folder, subfolder)
